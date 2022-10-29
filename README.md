@@ -34,7 +34,7 @@ W `APSI-Ideas` komenda `python manage.py runserver`.
 ### Dodanie danych do bazy
 Na panelu `/admin` można dodać wiersze do tabeli pomysły. Wtedy na głównej stronie będzie lista tych pomysłów.
 
-### docker
+## docker
 Uruchomienie w nowym środowisku (flaga -d powoduje uruchomienie kontenera w tle):
 1. docker-compose up -d
 
