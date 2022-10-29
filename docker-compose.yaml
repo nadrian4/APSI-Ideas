@@ -1,11 +1,6 @@
 version: '3'
 
 services:
-  web:
-    build:
-      context: app
-    ports:
-      - '8000:8000'
   db:
     image: postgres:latest
     restart: always
@@ -17,10 +12,28 @@ services:
         POSTGRES_USER: apsiadmin
         POSTGRES_PASSWORD: password
         POSTGRES_DB: apsi
+
   adminer:
     image: adminer
     restart: always
     ports:
       - 8080:8080
+
+  web:
+    build:
+      context: app
+    command:
+      sh -c "while ! nc -z db 5432; do sleep 1; done; python manage.py makemigrations; python manage.py migrate; python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+    environment:
+      - SECRET_KEY=haslo
+      - DB_NAME=apsi
+      - DB_USER=apsiadmin
+      - DB_PASS=password
+      - DB_HOST=db
+      - DB_PORT=5432
 volumes:
   pgdata:
