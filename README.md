@@ -18,6 +18,16 @@ python -m venv venv
 pip install Django psycopg2
 ```
 
+### Przygotowanie bazy
+W `APSI-Ideas`:
+```
+python manage.py makemigrations apsi_app
+python manage.py migrate
+```
+
+### Administrator strony
+W `APSI-Ideas`: `python manage.py createsuperuser`
+
 ### Uruchomienie strony
 W `APSI-Ideas` komenda `python manage.py runserver`.
 
