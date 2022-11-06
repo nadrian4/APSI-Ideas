@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from .models import Pomysl
 
@@ -24,4 +24,12 @@ def profile(request):
 
 
 def dodaj_pomysl(request):
-    return render(request, 'apsi_app/dodaj-pomysl.html')
+    if request.method == 'POST':
+        tytul = request.POST['tytul']
+        tresc = request.POST['tresc']
+
+        pomysl = Pomysl(tytul=tytul, tresc=tresc, uzytkownik=request.user)
+        pomysl.save()
+        return redirect('index')
+    else:
+        return render(request, 'apsi_app/dodaj-pomysl.html')

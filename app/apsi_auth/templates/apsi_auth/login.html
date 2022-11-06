@@ -1,0 +1,18 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label for="uzytkownik" class="form-label">Użytkownik</label>
+        <input type="text" class="form-control" id="uzytkownik" name="uzytkownik">
+    </div>
+    <div class="mb-3">
+        <label for="haslo" class="form-label">Hasło</label>
+        <input type="password" class="form-control" id="haslo" name="haslo">
+    </div>
+    <button type="submit" class="btn btn-primary">Zaloguj się</button>
+</form>
+
+{% endblock content %}
