@@ -6,20 +6,22 @@ from .models import Ocena, Pomysl
 
 def index(request):
     if request.method == 'POST':
-        ocena_pomyslu = request.POST['ocena']
         pomysl = Pomysl.objects.get(pk=request.POST['pomysl'])
-        ocena = Ocena(ocena=ocena_pomyslu, pomysl=pomysl, uzytkownik=request.user)
-        ocena.save()
-        
-        oceny = Ocena.objects.filter(pomysl=pomysl)
-        srednia_ocen = 0
 
-        for o in oceny:
-            srednia_ocen += o.ocena
+        if not Ocena.objects.filter(uzytkownik=request.user, pomysl=pomysl):
+            ocena_pomyslu = request.POST['ocena']
+            ocena = Ocena(ocena=ocena_pomyslu, pomysl=pomysl, uzytkownik=request.user)
+            ocena.save()
+            
+            oceny = Ocena.objects.filter(pomysl=pomysl)
+            srednia_ocen = 0
 
-        srednia_ocen = srednia_ocen / len(oceny)
-        pomysl.srednia_ocen = srednia_ocen * 20
-        pomysl.save()
+            for o in oceny:
+                srednia_ocen += o.ocena
+
+            srednia_ocen = srednia_ocen / len(oceny)
+            pomysl.srednia_ocen = srednia_ocen * 20
+            pomysl.save()
 
     paginator = Paginator(Pomysl.objects.all(), 5)
     page = request.GET.get('page')
