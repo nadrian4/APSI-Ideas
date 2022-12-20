@@ -18,3 +18,6 @@ class Ocena(models.Model):
     ocena = models.IntegerField()
     pomysl = models.ForeignKey(Pomysl, on_delete=models.CASCADE)
     uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.pomysl.__str__() + ', ' + str(self.ocena)
