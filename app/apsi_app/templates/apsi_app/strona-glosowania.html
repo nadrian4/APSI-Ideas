@@ -1,0 +1,58 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+<h1 class="mt-4">{{ glosowanie.nazwa }}</h1>
+
+{% for pomysl in pomysly %}
+<div class="card mb-3">
+  <div class="row g-0">
+    <div class="col-md-4">
+      <img src="..." class="img-fluid rounded-start" alt="...">
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <h5 class="card-title">{{ pomysl.tytul }}</h5>
+        <p class="card-text">{{ pomysl.tresc }}</p>
+        <p class="card-text"><small class="text-muted">{{ pomysl.data|date:'d.m.Y' }}</small></p>
+
+        <form class="row g-3" method="POST">
+          {% csrf_token %}
+
+          <input type="hidden" name="pomysl" value="{{pomysl.id}}">
+
+          <div class="col-auto">
+            <input class="form-check-input" type="radio" name="ocena" id="inlineRadio1" value="1">
+            <label class="form-check-label" for="inlineRadio1">1</label>
+          </div>
+          <div class="col-auto">
+            <input class="form-check-input" type="radio" name="ocena" id="inlineRadio2" value="2">
+            <label class="form-check-label" for="inlineRadio2">2</label>
+          </div>
+          <div class="col-auto">
+            <input class="form-check-input" type="radio" name="ocena" id="inlineRadio3" value="3">
+            <label class="form-check-label" for="inlineRadio3">3</label>
+          </div>
+          <div class="col-auto">
+            <input class="form-check-input" type="radio" name="ocena" id="inlineRadio4" value="4">
+            <label class="form-check-label" for="inlineRadio4">4</label>
+          </div>
+          <div class="col-auto">
+            <input class="form-check-input" type="radio" name="ocena" id="inlineRadio5" value="5">
+            <label class="form-check-label" for="inlineRadio3">5</label>
+          </div>
+          <div class="col-auto">  
+            <button type="submit" class="btn btn-primary mb-3">Oceń</button>
+          </div>
+        </form>
+
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" aria-label="Basic example" style="width: {{ pomysl.srednia_ocen }}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock content %}

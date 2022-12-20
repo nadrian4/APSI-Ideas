@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 
-from .models import Ocena, Pomysl
+from .models import Ocena, Glosowanie, Pomysl, GlosowaniePomysl
 
 
 def index(request):
@@ -58,3 +58,55 @@ def dodaj_pomysl(request):
         return redirect('index')
     else:
         return render(request, 'apsi_app/dodaj-pomysl.html')
+
+
+def glosowania(request):
+    context = {
+        'glosowania': Glosowanie.objects.all()
+    }
+
+    return render(request, 'apsi_app/glosowania.html', context)
+
+
+def utworz_glosowanie(request):
+    pomysly = Pomysl.objects.all()
+
+    context = {
+        'pomysly': pomysly
+    }
+
+    if request.method == 'POST':
+        nazwa = request.POST['nazwa']
+        wybrane_pomysly_id = request.POST.getlist('pomysly')
+        wybrane_pomysly = []
+
+        for id in wybrane_pomysly_id:
+            wybrane_pomysly.append(Pomysl.objects.get(pk=id))
+
+        glosowanie = Glosowanie(nazwa=nazwa)
+        glosowanie.save()
+
+        for pomysl in wybrane_pomysly:
+            glosowanie_pomysl = GlosowaniePomysl(glosowanie=glosowanie, pomysl=pomysl)
+            glosowanie_pomysl.save()
+
+        return redirect('glosowania')
+    else:
+        return render(request, 'apsi_app/utworz-glosowanie.html', context)
+
+
+def strona_glosowania(request):
+    glosowanie_id = request.GET['glosowanie_id']
+    glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
+    glosowanie_pomysl_list = GlosowaniePomysl.objects.filter(glosowanie=glosowanie)
+    pomysly = []
+
+    for glosowanie_pomysl in glosowanie_pomysl_list:
+        pomysly.append(glosowanie_pomysl.pomysl)
+
+    context = {
+        'glosowanie': glosowanie,
+        'pomysly': pomysly
+    }
+
+    return render(request, 'apsi_app/strona-glosowania.html', context)
