@@ -5,7 +5,8 @@ from django.contrib.auth.models import User
 
 class Glosowanie(models.Model):
     nazwa = models.CharField(max_length=20)
-    max_ocena = models.IntegerField()
+    max_glos = models.IntegerField()
+    data_koniec = models.DateField(default=timezone.now)
 
     def __str__(self):
             return self.nazwa
@@ -25,6 +26,13 @@ class Pomysl(models.Model):
 class GlosowaniePomysl(models.Model):
     glosowanie = models.ForeignKey(Glosowanie, on_delete=models.CASCADE)
     pomysl = models.ForeignKey(Pomysl, on_delete=models.CASCADE)
+
+
+class Glos(models.Model):
+    glosowanie = models.ForeignKey(Glosowanie, on_delete=models.CASCADE)
+    pomysl = models.ForeignKey(Pomysl, on_delete=models.CASCADE)
+    uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
+    glos = models.IntegerField()
 
 
 class Ocena(models.Model):

@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
+from django.utils import timezone
 
-from .models import Ocena, Glosowanie, Pomysl, GlosowaniePomysl
+from .models import Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena
 
 
 def index(request):
@@ -61,8 +62,13 @@ def dodaj_pomysl(request):
 
 
 def glosowania(request):
+    paginator = Paginator(Glosowanie.objects.all().order_by('data_koniec'), 5)
+    page = request.GET.get('page')
+    glosowania = paginator.get_page(page)
+
     context = {
-        'glosowania': Glosowanie.objects.all()
+        'glosowania': glosowania,
+        'page': page
     }
 
     return render(request, 'apsi_app/glosowania.html', context)
@@ -77,13 +83,15 @@ def utworz_glosowanie(request):
 
     if request.method == 'POST':
         nazwa = request.POST['nazwa']
+        max_glos = request.POST['max_glos']
+        data_koniec = request.POST['data_koniec']
         wybrane_pomysly_id = request.POST.getlist('pomysly')
         wybrane_pomysly = []
 
         for id in wybrane_pomysly_id:
             wybrane_pomysly.append(Pomysl.objects.get(pk=id))
 
-        glosowanie = Glosowanie(nazwa=nazwa)
+        glosowanie = Glosowanie(nazwa=nazwa, max_glos=max_glos, data_koniec=data_koniec)
         glosowanie.save()
 
         for pomysl in wybrane_pomysly:
@@ -96,17 +104,41 @@ def utworz_glosowanie(request):
 
 
 def strona_glosowania(request):
+    if request.method == 'POST':
+        glosowanie = Glosowanie.objects.get(pk=request.POST['glosowanie_id'])
+        pomysl = Pomysl.objects.get(pk=request.POST['pomysl_id'])
+        uzytkownik = request.user
+
+        if not Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik):
+            glos = Glos(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik, glos=request.POST['glos'])
+            glos.save()
+
     glosowanie_id = request.GET['glosowanie_id']
     glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
     glosowanie_pomysl_list = GlosowaniePomysl.objects.filter(glosowanie=glosowanie)
     pomysly = []
+    glos_list = list(range(1, glosowanie.max_glos + 1))
 
     for glosowanie_pomysl in glosowanie_pomysl_list:
         pomysly.append(glosowanie_pomysl.pomysl)
 
     context = {
         'glosowanie': glosowanie,
-        'pomysly': pomysly
+        'pomysly': pomysly,
+        'glos_list': glos_list
     }
 
     return render(request, 'apsi_app/strona-glosowania.html', context)
+
+
+def usun_glosowanie(request):
+    if request.method == 'POST':
+        glosowanie_id = request.GET['glosowanie_id']
+        glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
+        print(glosowanie)
+        glosowanie.delete()
+
+        return redirect('glosowania')
+
+
+    return render(request, 'apsi_app/usun-glosowanie.html')
