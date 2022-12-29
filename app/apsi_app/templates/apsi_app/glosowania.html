@@ -1,0 +1,54 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+<div class="row mt-4">
+  <div class="col" style="max-width: 700px;">
+    {% for glosowanie in glosowania %}
+      <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="..." class="img-fluid rounded-start" alt="...">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              {% now "Y-m-d" as todays_date %}
+              {% if todays_date <= glosowanie.data_koniec|date:"Y-m-d" %}
+                <h5><a href="{% url 'strona-glosowania' %}?glosowanie_id={{ glosowanie.id }}">{{ glosowanie.nazwa }}</a> <span class="badge bg-secondary">Otwarte</span></h5>
+              {% endif %}
+              {% if todays_date > glosowanie.data_koniec|date:"Y-m-d" %}
+                <h5><a href="{% url 'strona-glosowania' %}?glosowanie_id={{ glosowanie.id }}">{{ glosowanie.nazwa }}</a> <span class="badge bg-secondary">Zamknięte</span></h5>
+              {% endif %}
+
+              <p class="card-text"><small class="text-muted">{{ glosowanie.data_koniec|date:"d-m-Y" }}</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <div class="col" style="max-width: 200px;">
+    <nav class="sticky-top">
+      <a class="mb-3 btn btn-primary" href="{% url 'utworz-glosowanie' %}" role="button">Utwórz głosowanie</a>
+
+      <ul class="pagination">
+        {% if glosowania.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ glosowania.previous_page_number }}">Poprzedni</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link">Poprzedni</a></li>
+        {% endif %}
+
+        {% for i in glosowania.paginator.page_range %}
+            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+        {% endfor %}
+
+        {% if glosowania.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ glosowania.next_page_number }}">Następny</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link">Następny</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</div>
+
+{% endblock content %}
