@@ -53,12 +53,19 @@ def dodaj_pomysl(request):
     if request.method == 'POST':
         tytul = request.POST['tytul']
         tresc = request.POST['tresc']
+        kategoria = request.POST['kategoria']
 
-        pomysl = Pomysl(tytul=tytul, tresc=tresc, uzytkownik=request.user)
+        pomysl = Pomysl(tytul=tytul, kategoria=kategoria, tresc=tresc, uzytkownik=request.user)
         pomysl.save()
         return redirect('index')
     else:
-        return render(request, 'apsi_app/dodaj-pomysl.html')
+        kategorie = ['Edukacja', 'Życie społeczne', 'Infrastruktura']
+
+        context = {
+            'kategorie': kategorie
+        }
+
+        return render(request, 'apsi_app/dodaj-pomysl.html', context)
 
 
 def glosowania(request):

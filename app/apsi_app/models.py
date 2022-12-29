@@ -14,6 +14,7 @@ class Glosowanie(models.Model):
 
 class Pomysl(models.Model):
     tytul = models.CharField(max_length=20)
+    kategoria = models.CharField(max_length=20, default='Ogólne')
     tresc = models.CharField(max_length=200)
     data = models.DateField(default=timezone.now)
     srednia_ocen = models.IntegerField(default=0)
