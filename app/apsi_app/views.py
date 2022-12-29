@@ -95,7 +95,7 @@ def utworz_glosowanie(request):
         glosowanie.save()
 
         for pomysl in wybrane_pomysly:
-            glosowanie_pomysl = GlosowaniePomysl(glosowanie=glosowanie, pomysl=pomysl)
+            glosowanie_pomysl = GlosowaniePomysl(glosowanie=glosowanie, pomysl=pomysl, srednia_glosow=0)
             glosowanie_pomysl.save()
 
         return redirect('glosowania')
