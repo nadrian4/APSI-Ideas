@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+from django.conf import settings
+
 
 class Glosowanie(models.Model):
     nazwa = models.CharField(max_length=20)
@@ -15,6 +17,7 @@ class Glosowanie(models.Model):
 class Pomysl(models.Model):
     tytul = models.CharField(max_length=20)
     kategoria = models.CharField(max_length=20, default='Ogólne')
+    kto_moze_oceniac = models.CharField(max_length=20, default='Wszyscy')
     tresc = models.CharField(max_length=200)
     data = models.DateField(default=timezone.now)
     srednia_ocen = models.IntegerField(default=0)

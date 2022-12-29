@@ -3,7 +3,7 @@
 
 <div class="row mt-4">
   <div class="col" style="max-width: 700px;">
-    {% for pomysl in pomysly %}
+    {% for pomysl_kto_moze_oceniac in pomysly_kto_moze_oceniac %}
       <div class="card mb-3">
         <div class="row g-0">
           <div class="col-md-4">
@@ -11,10 +11,11 @@
           </div>
           <div class="col-md-8">
             <div class="card-body">
-              <h5 class="card-title">{{ pomysl.tytul }} <span class="badge bg-secondary">{{ pomysl.kategoria }}</span></h5>
-              <p class="card-text">{{ pomysl.tresc }}</p>
-              <p class="card-text"><small class="text-muted">{{ pomysl.data|date:'d.m.Y' }}</small></p>
+              <h5 class="card-title">{{ pomysl_kto_moze_oceniac.pomysl.tytul }} <span class="badge bg-secondary">{{ pomysl_kto_moze_oceniac.pomysl.kategoria }}</span></h5>
+              <p class="card-text">{{ pomysl_kto_moze_oceniac.pomysl.tresc }}</p>
+              <p class="card-text"><small class="text-muted">{{ pomysl_kto_moze_oceniac.pomysl.data|date:'d.m.Y' }}</small></p>
 
+              {% if pomysl_kto_moze_oceniac.moze_oceniac %}
               <form class="row g-3" method="POST">
                 {% csrf_token %}
 
@@ -44,9 +45,12 @@
                   <button type="submit" class="btn btn-primary mb-3">Oceń</button>
                 </div>
               </form>
+              {% else %}
+              <span class="mb-3 badge text-bg-secondary">Nie możesz oceniać</span>
+              {% endif %}
 
               <div class="progress">
-                <div class="progress-bar" role="progressbar" aria-label="Basic example" style="width: {{ pomysl.srednia_ocen }}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar" role="progressbar" aria-label="Basic example" style="width: {{ pomysl_kto_moze_oceniac.pomysl.srednia_ocen }}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
               </div>
               
             </div>

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 from .models import Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena
 
@@ -27,9 +28,21 @@ def index(request):
     paginator = Paginator(Pomysl.objects.all(), 5)
     page = request.GET.get('page')
     pomysly = paginator.get_page(page)
+    pomysly_kto_moze_oceniac = []
+
+    user_groups = request.user.groups.all()
+
+    for pomysl in pomysly:
+        moze_oceniac = False
+
+        if user_groups[0].__str__() == pomysl.kto_moze_oceniac or pomysl.kto_moze_oceniac == 'Wszyscy':
+            moze_oceniac = True
+
+        pomysly_kto_moze_oceniac.append({'pomysl': pomysl, 'moze_oceniac': moze_oceniac})
 
     context = {
         'pomysly': pomysly,
+        'pomysly_kto_moze_oceniac': pomysly_kto_moze_oceniac,
         'pomysly_liczba': range(1, paginator.num_pages+1),
         'page': page
     }
@@ -42,8 +55,15 @@ def login(request):
 
 
 def profile(request):
+    user = request.user
+    user_groups = user.groups.all()
+    
+    for group in user_groups:
+        print(group)
+
     context = {
-        'user': request.user
+        'user': request.user,
+        'user_groups': user_groups
     }
 
     return render(request, 'apsi_app/profile.html', context)
@@ -54,15 +74,18 @@ def dodaj_pomysl(request):
         tytul = request.POST['tytul']
         tresc = request.POST['tresc']
         kategoria = request.POST['kategoria']
+        kto_moze_oceniac = request.POST['kto_moze_oceniac']
 
-        pomysl = Pomysl(tytul=tytul, kategoria=kategoria, tresc=tresc, uzytkownik=request.user)
+        pomysl = Pomysl(tytul=tytul, kategoria=kategoria, kto_moze_oceniac=kto_moze_oceniac, tresc=tresc, uzytkownik=request.user)
         pomysl.save()
         return redirect('index')
     else:
         kategorie = ['Edukacja', 'Życie społeczne', 'Infrastruktura']
+        kto_moze_oceniac = ['Student', 'Pracownik', 'Wszyscy']
 
         context = {
-            'kategorie': kategorie
+            'kategorie': kategorie,
+            'kto_moze_oceniac': kto_moze_oceniac
         }
 
         return render(request, 'apsi_app/dodaj-pomysl.html', context)

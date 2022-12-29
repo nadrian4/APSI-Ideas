@@ -9,6 +9,12 @@
         <input type="text" class="form-control" id="exampleFormControlInput1" name="tytul" placeholder="Tytuł">
     </div>
 
+
+    <div class="mb-3">
+        <label for="exampleFormControlTextarea1" class="form-label">Treść</label>
+        <textarea class="form-control" id="exampleFormControlTextarea1" name="tresc" rows="3"></textarea>
+    </div>
+
     <div class="mb-3">
         <label for="kategoria" class="form-label">Kategoria</label>
         <select id="kategoria" name="kategoria" class="form-select" aria-label="Default select example">
@@ -20,8 +26,13 @@
     </div>
 
     <div class="mb-3">
-        <label for="exampleFormControlTextarea1" class="form-label">Treść</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" name="tresc" rows="3"></textarea>
+        <label for="kto_moze_oceniac" class="form-label">Kto może oceniać</label>
+        <select id="kto_moze_oceniac" name="kto_moze_oceniac" class="form-select" aria-label="Default select example">
+            <option selected>Wybierz kategorię</option>
+            {% for i in kto_moze_oceniac %}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
     </div>
 
     <button type="submit" class="btn btn-primary">Dodaj pomysł</button>
