@@ -1,9 +1,10 @@
 {% extends "apsi_app/base.html" %}
 {% block content %}
 
-<h1 class="display-6 mt-4 mb-4">{{ glosowanie.nazwa }}</h1>
+<h1 class="display-6 mt-3">{{ glosowanie.nazwa }}</h1>
+<a class="mt-3 mb-3 btn btn-danger" href="{% url 'usun-glosowanie' %}?glosowanie_id={{ glosowanie.id }}" role="button">Usuń głosowanie</a>
 
-{% for pomysl in pomysly %}
+{% for pomysl in pomysly_srednia_glos %}
 <div class="card mb-3">
   <div class="row g-0">
     <div class="col-md-4">
@@ -11,15 +12,19 @@
     </div>
     <div class="col-md-4">
       <div class="card-body">
-        <h5 class="card-title">{{ pomysl.tytul }}</h5>
-        <p class="card-text">{{ pomysl.tresc }}</p>
-        <p class="card-text"><small class="text-muted">{{ pomysl.data|date:'d.m.Y' }}</small></p>
+        <h5 class="card-title">{{ pomysl.pomysl.tytul }}</h5>
+        <p class="card-text">{{ pomysl.pomysl.tresc }}</p>
+        <p class="card-text"><small class="text-muted">{{ pomysl.pomysl.data|date:'d.m.Y' }}</small></p>
+
+
+        {% now "Y-m-d" as todays_date %}
+        {% if todays_date <= glosowanie.data_koniec|date:"Y-m-d" %}
 
         <form class="row" method="POST">
           {% csrf_token %}
 
           <input type="hidden" name="glosowanie_id" value="{{glosowanie.id}}">
-          <input type="hidden" name="pomysl_id" value="{{pomysl.id}}">
+          <input type="hidden" name="pomysl_id" value="{{pomysl.pomysl.id}}">
 
           <div class="row">
             <div class="col">
@@ -35,13 +40,21 @@
             </div>
           </div>
         </form>
+
+        <span class="badge bg-secondary">Otwarte</span>
+
+        {% endif %}
+        {% if todays_date > glosowanie.data_koniec|date:"Y-m-d" %}
+
+        <span class="badge bg-secondary">Zamknięte</span>
+        {{ pomysl.glos }}
+
+        {% endif %}
         
       </div>
     </div>
   </div>
 </div>
 {% endfor %}
-
-<a class="mt-3 btn btn-danger" href="{% url 'usun-glosowanie' %}?glosowanie_id={{ glosowanie.id }}" role="button">Usuń głosowanie</a>
 
 {% endblock content %}

@@ -26,6 +26,7 @@ class Pomysl(models.Model):
 class GlosowaniePomysl(models.Model):
     glosowanie = models.ForeignKey(Glosowanie, on_delete=models.CASCADE)
     pomysl = models.ForeignKey(Pomysl, on_delete=models.CASCADE)
+    srednia_glosow = models.FloatField()
 
 
 class Glos(models.Model):

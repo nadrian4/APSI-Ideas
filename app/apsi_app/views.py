@@ -113,18 +113,32 @@ def strona_glosowania(request):
             glos = Glos(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik, glos=request.POST['glos'])
             glos.save()
 
+        else:
+            glos = Glos.objects.get(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik)
+            glos.glos = request.POST['glos']
+            glos.save()
+    
+        glosy_pomysl = Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl)
+        glosy_pomysl = [g.glos for g in glosy_pomysl]
+        glosy_pomysl_mean = sum(glosy_pomysl) / len(glosy_pomysl)
+
+        glosowanie_pomysl = GlosowaniePomysl.objects.get(glosowanie=glosowanie, pomysl=pomysl)
+        glosowanie_pomysl.srednia_glosow = glosy_pomysl_mean
+        glosowanie_pomysl.save()
+
     glosowanie_id = request.GET['glosowanie_id']
     glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
     glosowanie_pomysl_list = GlosowaniePomysl.objects.filter(glosowanie=glosowanie)
-    pomysly = []
-    glos_list = list(range(1, glosowanie.max_glos + 1))
-
+    pomysly_srednia_glos = []
+    
     for glosowanie_pomysl in glosowanie_pomysl_list:
-        pomysly.append(glosowanie_pomysl.pomysl)
+        pomysly_srednia_glos.append({'pomysl': glosowanie_pomysl.pomysl, 'glos': glosowanie_pomysl.srednia_glosow})
+
+    glos_list = list(range(1, glosowanie.max_glos + 1))
 
     context = {
         'glosowanie': glosowanie,
-        'pomysly': pomysly,
+        'pomysly_srednia_glos': pomysly_srednia_glos,
         'glos_list': glos_list
     }
 
@@ -135,7 +149,6 @@ def usun_glosowanie(request):
     if request.method == 'POST':
         glosowanie_id = request.GET['glosowanie_id']
         glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
-        print(glosowanie)
         glosowanie.delete()
 
         return redirect('glosowania')
