@@ -2,7 +2,16 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-from django.conf import settings
+KATEGORIE = (
+    ('Edukacja', 'Edukacja'),
+    ('Życie społeczne', 'Życie społeczne'),
+    ('Infrastruktura', 'Infrastruktura'),
+)
+ROLE = (
+    ('Student', 'Student'),
+    ('Pracownik', 'Pracownik'),
+    ('Wszyscy', 'Wszyscy'),
+)
 
 
 class Glosowanie(models.Model):
@@ -16,9 +25,10 @@ class Glosowanie(models.Model):
 
 class Pomysl(models.Model):
     tytul = models.CharField(max_length=20)
-    kategoria = models.CharField(max_length=20, default='Ogólne')
-    kto_moze_oceniac = models.CharField(max_length=20, default='Wszyscy')
     tresc = models.CharField(max_length=200)
+    kategoria = models.CharField(max_length=20, choices=KATEGORIE)
+    kto_moze_oceniac = models.CharField(max_length=20, choices=ROLE)
+    plik = models.ImageField(upload_to='app/apsi_app/pliki/pomysl-pliki', null=True)
     data = models.DateField(default=timezone.now)
     srednia_ocen = models.IntegerField(default=0)
     uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
