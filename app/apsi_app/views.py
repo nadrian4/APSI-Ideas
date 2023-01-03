@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.urls import reverse
 
 from .models import Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz
 
@@ -167,7 +168,7 @@ def usun_glosowanie(request):
 def komentarze(request):
     pomysl_id = request.GET['pomysl_id']
     pomysl = Pomysl.objects.get(pk=pomysl_id)
-    komentarze = Komentarz.objects.filter(pomysl=pomysl_id).order_by('rodzic');
+    komentarze = Komentarz.objects.filter(pomysl=pomysl_id).order_by('-rodzic');
     
     context = {
         'komentarze': komentarze,
@@ -183,20 +184,19 @@ def dodaj_komentarz(request):
     
     if komentarz_id:
         komentarz = Komentarz.objects.get(pk=komentarz_id)
-        pomysl = Pomysl.objects.get(pk=komentarz.pomysl.pk)
+        pomysl_id = komentarz.pomysl.pk
         komentarz_do_komentarza = True
     else:
         komentarz = None
         komentarz_do_komentarza = False
-        pomysl = Pomysl.objects.get(pk=pomysl_id)
+
+    pomysl = Pomysl.objects.get(pk=pomysl_id)
 
     if request.method == 'POST':
         tresc = request.POST['tresc']
         komentarz = Komentarz(tresc=tresc, uzytkownik=request.user, rodzic=komentarz, pomysl=pomysl)
         komentarz.save()
-        #return redirect(f'komentarze')
-        return redirect(f'komentarze?pomysl_id=1')
-        #return redirect(f'komentarze?pomysl_id={pomysl_id}')
+        return redirect(reverse('komentarze')+f"?pomysl_id={pomysl_id}")
 
     context = {
         'komentarz_id': komentarz_id,
