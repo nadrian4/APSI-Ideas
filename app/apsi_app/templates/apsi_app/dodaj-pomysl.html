@@ -1,12 +1,55 @@
 {% extends "apsi_app/base.html" %}
 {% block content %}
 
-<form method="POST" enctype="multipart/form-data" style="max-width: 700px;">
+<form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
 
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Tytuł</span>
+        <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1" name="{{ pomysl_form.tytul.name }}">
+    </div>      
+
+    <div class="input-group mb-3">
+        <span class="input-group-text">Treść</span>
+        <textarea class="form-control" aria-label="With textarea" name="{{ pomysl_form.tresc.name }}"></textarea>
+    </div>
+
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="inputGroupSelect01">Kategoria</label>
+        <select class="form-select" id="inputGroupSelect01" name="{{ pomysl_form.kategoria.name }}">
+            <option selected>Wybierz...</option>
+            {% for i in kategorie %}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="inputGroupSelect01">Kto może oceniać</label>
+        <select class="form-select" id="inputGroupSelect01" name="{{ pomysl_form.kto_moze_oceniac.name }}">
+            <option selected>Wybierz...</option>
+            {% for i in role %}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
     <div class="mb-3">
+        <!-- <label for="formFile" class="form-label">Default file input example</label> -->
+        <input class="form-control" type="file" id="formFile" name="{{ pomysl_form.plik.name }}">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Dodaj pomysł</button>
+
+    <!-- <div class="mb-3">
         <label for="exampleFormControlInput1" class="form-label">Tytuł</label>
         <input type="text" class="form-control" id="exampleFormControlInput1" name="tytul" placeholder="Tytuł">
+    </div>
+
+
+    <div class="mb-3">
+        <label for="exampleFormControlTextarea1" class="form-label">Treść</label>
+        <textarea class="form-control" id="exampleFormControlTextarea1" name="tresc" rows="3"></textarea>
     </div>
 
     <div class="mb-3">
@@ -20,11 +63,16 @@
     </div>
 
     <div class="mb-3">
-        <label for="exampleFormControlTextarea1" class="form-label">Treść</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" name="tresc" rows="3"></textarea>
+        <label for="kto_moze_oceniac" class="form-label">Kto może oceniać</label>
+        <select id="kto_moze_oceniac" name="kto_moze_oceniac" class="form-select" aria-label="Default select example">
+            <option selected>Wybierz kategorię</option>
+            {% for i in kto_moze_oceniac %}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
     </div>
 
-    <button type="submit" class="btn btn-primary">Dodaj pomysł</button>
+    <button type="submit" class="btn btn-primary">Dodaj pomysł</button> -->
 </form>
 
 {% endblock content %}
