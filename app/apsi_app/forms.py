@@ -9,7 +9,7 @@ class PomyslForm(forms.ModelForm):
     tresc = forms.CharField(max_length=200)
     kategoria = forms.ChoiceField(choices=KATEGORIE)
     kto_moze_oceniac = forms.ChoiceField(choices=ROLE)
-    plik = forms.ImageField()
+    plik = forms.ImageField(required=False)
 
     class Meta:
         model = Pomysl

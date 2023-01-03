@@ -19,7 +19,7 @@
               <form class="row g-3" method="POST">
                 {% csrf_token %}
 
-                <input type="hidden" name="pomysl" value="{{pomysl.id}}">
+                <input type="hidden" name="pomysl" value="{{pomysl_kto_moze_oceniac.pomysl.id}}">
 
                 <div class="col-auto">
                   <input class="form-check-input" type="radio" name="ocena" id="inlineRadio1" value="1">
