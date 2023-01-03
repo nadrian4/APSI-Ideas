@@ -36,6 +36,15 @@ class Glos(models.Model):
     uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
     glos = models.IntegerField()
 
+class Komentarz(models.Model):
+    tresc = models.CharField(max_length=200)
+    data = models.DateField(default=timezone.now)
+    uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
+    rodzic = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
+    pomysl = models.ForeignKey(Pomysl, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.tresc
 
 class Ocena(models.Model):
     ocena = models.IntegerField()

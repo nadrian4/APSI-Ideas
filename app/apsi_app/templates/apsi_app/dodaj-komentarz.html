@@ -1,0 +1,39 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+{% if komentarz_do_komentarza %}
+    <h4>Komentarz do komentarza</h4>
+    <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+            <div class="card-body">
+              {{komentarz.uzytkownik}}, {{komentarz.data}}
+                <div class="row g-0" style="padding-left: 5%; padding-top: 10px;">
+                    {{komentarz.tresc}}
+                </div>
+            </div>
+        </div>
+      </div>
+{% else %}
+    <h4>Komentarz do pomysłu</h4>
+    <div class="card mb-3" style="max-width: 540px;">
+        <div class="col-md-8">
+            <div class="card-body">
+            <h5 class="card-title">{{ pomysl.tytul }} <span class="badge bg-secondary">{{ pomysl.kategoria }}</span></h5>
+            <p class="card-text">{{ pomysl.tresc }}</p>
+            <p class="card-text"><small class="text-muted">{{ pomysl.data|date:'d.m.Y' }}</small></p>
+            </div>
+        </div>
+    </div>
+{% endif %}
+<form method="POST" style="max-width: 700px;">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label for="exampleFormControlTextarea1" class="form-label">Treść</label>
+        <textarea class="form-control" id="exampleFormControlTextarea1" name="tresc" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Dodaj komentarz</button>
+</form>
+
+{% endblock content %}
