@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.urls import reverse
 from django.contrib.auth.models import User
 
-from .models import Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena
+from .models import Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz
 from .models import KATEGORIE, ROLE
 from .forms import PomyslForm
-
 
 def index(request):
     if request.method == 'POST':
@@ -217,6 +217,7 @@ def strona_glosowania(request):
 
     context = {
         'glosowanie': glosowanie,
+        'glosowanie_id': glosowanie_id,
         'pomysly_srednia_glos': pomysly_srednia_glos,
         'glos_list': glos_list
     }
@@ -232,5 +233,50 @@ def usun_glosowanie(request):
 
         return redirect('glosowania')
 
-
     return render(request, 'apsi_app/usun-glosowanie.html')
+
+
+def komentarze(request):
+    pomysl_id = request.GET['pomysl_id']
+    pomysl = Pomysl.objects.get(pk=pomysl_id)
+    komentarze = Komentarz.objects.filter(pomysl=pomysl_id).order_by('-rodzic');
+    
+    context = {
+        'komentarze': komentarze,
+        'pomysl': pomysl,
+        'pomysl_id': pomysl_id,
+    }
+
+    return render(request, 'apsi_app/komentarze.html', context)
+
+
+def dodaj_komentarz(request):
+    pomysl_id = request.GET.get('pomysl_id', None)
+    komentarz_id = request.GET.get('komentarz_id', None)
+    
+    if komentarz_id:
+        komentarz = Komentarz.objects.get(pk=komentarz_id)
+        pomysl_id = komentarz.pomysl.pk
+        komentarz_do_komentarza = True
+    else:
+        komentarz = None
+        komentarz_do_komentarza = False
+
+    pomysl = Pomysl.objects.get(pk=pomysl_id)
+
+    if request.method == 'POST':
+        tresc = request.POST['tresc']
+        komentarz = Komentarz(tresc=tresc, uzytkownik=request.user, rodzic=komentarz, pomysl=pomysl)
+        komentarz.save()
+        return redirect(reverse('komentarze')+f"?pomysl_id={pomysl_id}")
+
+    context = {
+        'komentarz_id': komentarz_id,
+        'komentarz': komentarz,
+        'pomysl_id': pomysl_id,
+        'pomysl': pomysl,
+        'komentarz_do_komentarza': komentarz_do_komentarza,
+    }
+    
+    return render(request, 'apsi_app/dodaj-komentarz.html', context)
+

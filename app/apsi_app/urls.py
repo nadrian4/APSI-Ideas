@@ -13,4 +13,6 @@ urlpatterns = [
     path('utworz-glosowanie', views.utworz_glosowanie, name='utworz-glosowanie'),
     path('strona-glosowania', views.strona_glosowania, name='strona-glosowania'),
     path('usun-glosowanie', views.usun_glosowanie, name='usun-glosowanie'),
+    path('komentarze', views.komentarze, name='komentarze'),
+    path('dodaj-komentarz', views.dodaj_komentarz, name='dodaj-komentarz'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
