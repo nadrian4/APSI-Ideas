@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 from .models import Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena
+from .models import KATEGORIE, ROLE
+from .forms import PomyslForm
 
 
 def index(request):
@@ -27,9 +30,21 @@ def index(request):
     paginator = Paginator(Pomysl.objects.all(), 5)
     page = request.GET.get('page')
     pomysly = paginator.get_page(page)
+    pomysly_kto_moze_oceniac = []
+
+    user_groups = request.user.groups.all()
+
+    for pomysl in pomysly:
+        moze_oceniac = False
+
+        if user_groups[0].__str__() == pomysl.kto_moze_oceniac or pomysl.kto_moze_oceniac == 'Wszyscy':
+            moze_oceniac = True
+
+        pomysly_kto_moze_oceniac.append({'pomysl': pomysl, 'moze_oceniac': moze_oceniac})
 
     context = {
         'pomysly': pomysly,
+        'pomysly_kto_moze_oceniac': pomysly_kto_moze_oceniac,
         'pomysly_liczba': range(1, paginator.num_pages+1),
         'page': page
     }
@@ -42,8 +57,20 @@ def login(request):
 
 
 def profile(request):
+    user = request.user
+    user_groups = user.groups.all()
+    
+    for group in user_groups:
+        print(group)
+
+    paginator = Paginator(Pomysl.objects.filter(uzytkownik=request.user), 5)
+    page = request.GET.get('page')
+    pomysly_uzytkownika = paginator.get_page(page)
+
     context = {
-        'user': request.user
+        'user': request.user,
+        'user_groups': user_groups,
+        'pomysly_uzytkownika': pomysly_uzytkownika,
     }
 
     return render(request, 'apsi_app/profile.html', context)
@@ -51,21 +78,66 @@ def profile(request):
 
 def dodaj_pomysl(request):
     if request.method == 'POST':
-        tytul = request.POST['tytul']
-        tresc = request.POST['tresc']
-        kategoria = request.POST['kategoria']
+        pomysl_form = PomyslForm(request.POST, request.FILES)
 
-        pomysl = Pomysl(tytul=tytul, kategoria=kategoria, tresc=tresc, uzytkownik=request.user)
-        pomysl.save()
-        return redirect('index')
+        if pomysl_form.is_valid():
+            inst = pomysl_form.save(commit=False)
+            inst.uzytkownik = request.user
+            inst.save()
+
+            # tytul = pomysl_form.cleaned_data['tytul']
+            # tresc = pomysl_form.cleaned_data['tresc']
+            # kategoria = pomysl_form.cleaned_data['kategoria']
+            # kto_moze_oceniac = pomysl_form.cleaned_data['kto_moze_oceniac']
+            # plik = pomysl_form.cleaned_data['plik']
+
+            # pomysl = Pomysl(tytul=tytul, tresc=tresc, kategoria=kategoria, kto_moze_oceniac=kto_moze_oceniac, uzytkownik=request.user)
+            # pomysl.save()
+
+            return redirect('index')
+        else:
+            print('form invalid')
     else:
-        kategorie = ['Edukacja', 'Życie społeczne', 'Infrastruktura']
+        pomysl_form = PomyslForm()
 
-        context = {
-            'kategorie': kategorie
-        }
+    context = {
+        'pomysl_form': pomysl_form,
+        'kategorie': [k[1] for k in KATEGORIE],
+        'role': [r[1] for r in ROLE],
+    }
 
-        return render(request, 'apsi_app/dodaj-pomysl.html', context)
+    return render(request, 'apsi_app/dodaj-pomysl.html', context)
+
+    # if request.method == 'POST':
+    #     tytul = request.POST['tytul']
+    #     tresc = request.POST['tresc']
+    #     kategoria = request.POST['kategoria']
+    #     kto_moze_oceniac = request.POST['kto_moze_oceniac']
+
+    #     pomysl = Pomysl(tytul=tytul, kategoria=kategoria, kto_moze_oceniac=kto_moze_oceniac, tresc=tresc, uzytkownik=request.user)
+    #     pomysl.save()
+    #     return redirect('index')
+    # else:
+    #     kategorie = ['Edukacja', 'Życie społeczne', 'Infrastruktura']
+    #     kto_moze_oceniac = ['Student', 'Pracownik', 'Wszyscy']
+
+    #     context = {
+    #         'kategorie': kategorie,
+    #         'kto_moze_oceniac': kto_moze_oceniac
+    #     }
+
+    #     return render(request, 'apsi_app/dodaj-pomysl.html', context)
+
+
+def usun_pomysl(request):
+    if request.method == 'POST':
+        pomysl_id = request.GET['pomysl_id']
+        pomysl = Pomysl.objects.get(pk=pomysl_id)
+        pomysl.delete()
+
+        return redirect('profile')
+
+    return render(request, 'apsi_app/usun-pomysl.html')
 
 
 def glosowania(request):

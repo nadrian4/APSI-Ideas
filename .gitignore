@@ -1,4 +1,5 @@
 migrations
+app/apsi_app/pliki/pomysl-pliki/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
