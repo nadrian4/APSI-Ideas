@@ -1,0 +1,20 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="mt-3 mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Nazwa</label>
+        <input type="text" class="form-control" id="exampleFormControlInput1" name="nazwa">
+    </div>
+
+    <div class="mt-3 mb-3">
+        <label for="Input1" class="form-label">Data zakończenia konkursu</label>
+        <input type="text" class="form-control" id="Input1" name="data_koniec">
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Utwórz konkurs</button>
+</form>
+
+{% endblock content %}

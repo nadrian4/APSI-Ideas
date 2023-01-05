@@ -3,8 +3,9 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.db import transaction
 
-from .models import Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz
+from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz
 from .models import KATEGORIE, ROLE
 from .forms import PomyslForm
 
@@ -50,6 +51,70 @@ def index(request):
     }
 
     return render(request, 'apsi_app/index.html', context)
+
+
+def konkursy(request):
+    paginator = Paginator(Konkurs.objects.all(), 5)
+    page = request.GET.get('page')
+    konkursy = paginator.get_page(page)
+
+    context = {
+        'konkursy': konkursy,
+        'page': page
+    }
+
+    if request.user.groups.filter(name='Członek komisji'):
+        return render(request, 'apsi_app/konkursy/konkursy.html', context)
+    else:
+        return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Członek komisji'})
+
+
+def strona_konkursu(request):
+    konkurs = Konkurs.objects.get(pk=request.GET['konkurs_id'])
+
+    if request.method == 'POST':
+        wybrane_pomysly_id = request.POST.getlist('pomysly')
+        wybrane_pomysly = Pomysl.objects.filter(pk__in=wybrane_pomysly_id)
+
+        with transaction.atomic():
+            for pomysl in wybrane_pomysly:
+                pomysl.konkurs = konkurs
+                pomysl.save()
+
+    pomysly_konkursu = Pomysl.objects.filter(konkurs=konkurs)
+    pomysly_uzytkownika = Pomysl.objects.filter(uzytkownik=request.user)
+
+    context = {
+        'konkurs': konkurs,
+        'pomysly_konkursu': pomysly_konkursu,
+        'pomysly_niedodane': [pomysl for pomysl in pomysly_uzytkownika if pomysl not in pomysly_konkursu],
+        'pomysly_dodane': [pomysl for pomysl in pomysly_uzytkownika if pomysl in pomysly_konkursu],
+    }
+
+    return render(request, 'apsi_app/konkursy/strona-konkursu.html', context)
+
+
+def utworz_konkurs(request):
+    if request.method == 'POST':
+        nazwa = request.POST['nazwa']
+        data_koniec = request.POST['data_koniec']
+        konkurs = Konkurs(nazwa=nazwa, data_koniec=data_koniec)
+        konkurs.save()
+
+        return redirect('konkursy')
+    else:
+        return render(request, 'apsi_app/konkursy/utworz-konkurs.html')
+
+
+def usun_konkurs(request):
+    if request.method == 'POST':
+        konkurs_id = request.GET['konkurs_id']
+        konkurs = Konkurs.objects.get(pk=konkurs_id)
+        konkurs.delete()
+
+        return redirect('konkursy')
+
+    return render(request, 'apsi_app/konkursy/usun-konkurs.html')
 
 
 def login(request):
@@ -150,36 +215,47 @@ def glosowania(request):
         'page': page
     }
 
-    return render(request, 'apsi_app/glosowania.html', context)
+    return render(request, 'apsi_app/glosowania/glosowania.html', context)
 
 
 def utworz_glosowanie(request):
-    pomysly = Pomysl.objects.all()
-
-    context = {
-        'pomysly': pomysly
-    }
-
     if request.method == 'POST':
-        nazwa = request.POST['nazwa']
-        max_glos = request.POST['max_glos']
-        data_koniec = request.POST['data_koniec']
-        wybrane_pomysly_id = request.POST.getlist('pomysly')
-        wybrane_pomysly = []
+        if 'wybierz_konkurs' in request.POST:
+            wybrany_konkurs = Konkurs.objects.get(pk=request.POST['wybierz_konkurs'])
 
-        for id in wybrane_pomysly_id:
-            wybrane_pomysly.append(Pomysl.objects.get(pk=id))
+            context = {
+                'pomysly': Pomysl.objects.filter(konkurs=wybrany_konkurs),
+                'konkursy': Konkurs.objects.all(),
+                'wybrany_konkurs': wybrany_konkurs
+            }
 
-        glosowanie = Glosowanie(nazwa=nazwa, max_glos=max_glos, data_koniec=data_koniec)
-        glosowanie.save()
+            return render(request, 'apsi_app/glosowania/utworz-glosowanie.html', context)
+        elif 'utworz_glosowanie' in request.POST:
+            nazwa = request.POST['nazwa']
+            max_glos = request.POST['max_glos']
+            data_koniec = request.POST['data_koniec']
+            wybrane_pomysly_id = request.POST.getlist('pomysly')
+            wybrane_pomysly = []
 
-        for pomysl in wybrane_pomysly:
-            glosowanie_pomysl = GlosowaniePomysl(glosowanie=glosowanie, pomysl=pomysl, srednia_glosow=0)
-            glosowanie_pomysl.save()
+            for id in wybrane_pomysly_id:
+                wybrane_pomysly.append(Pomysl.objects.get(pk=id))
 
-        return redirect('glosowania')
+            glosowanie = Glosowanie(nazwa=nazwa, max_glos=max_glos, data_koniec=data_koniec)
+
+            with transaction.atomic():
+                glosowanie.save()
+
+                for pomysl in wybrane_pomysly:
+                    glosowanie_pomysl = GlosowaniePomysl(glosowanie=glosowanie, pomysl=pomysl, srednia_glosow=0)
+                    glosowanie_pomysl.save()
+
+            return redirect('glosowania')
     else:
-        return render(request, 'apsi_app/utworz-glosowanie.html', context)
+        context = {
+            'konkursy': Konkurs.objects.all()
+        }
+
+        return render(request, 'apsi_app/glosowania/utworz-glosowanie.html', context)
 
 
 def strona_glosowania(request):
@@ -222,7 +298,7 @@ def strona_glosowania(request):
         'glos_list': glos_list
     }
 
-    return render(request, 'apsi_app/strona-glosowania.html', context)
+    return render(request, 'apsi_app/glosowania/strona-glosowania.html', context)
 
 
 def usun_glosowanie(request):
@@ -233,7 +309,7 @@ def usun_glosowanie(request):
 
         return redirect('glosowania')
 
-    return render(request, 'apsi_app/usun-glosowanie.html')
+    return render(request, 'apsi_app/glosowania/usun-glosowanie.html')
 
 
 def komentarze(request):
