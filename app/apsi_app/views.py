@@ -250,7 +250,8 @@ def komentarze(request):
     context = {
         'komentarzeGlebokosc': komentarzeGlebokosc,
         'pomysl': pomysl,
-        'pomysl_id': pomysl_id,
+        'kategorie': [k[1] for k in KATEGORIE],
+        'role': [r[1] for r in ROLE],
     }
 
     return render(request, 'apsi_app/komentarze.html', context)

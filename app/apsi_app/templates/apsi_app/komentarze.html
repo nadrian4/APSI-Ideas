@@ -3,15 +3,42 @@
 
 <div class="row mt-4">
     <div class="col" style="max-width: 700px;">
-        <div class="col-md-8">
-            <div class="card-body">
-              <h5 class="card-title">{{ pomysl.tytul }} <span class="badge bg-secondary">{{ pomysl.kategoria }}</span></h5>
-              <p class="card-text">{{ pomysl.tresc }}</p>
-              <p class="card-text"><small class="text-muted">{{ pomysl.data|date:'d.m.Y' }}</small></p>
-            </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon1">Tytuł</span>
+            <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1" value="{{ pomysl.tytul }}" readonly>
+        </div>      
+    
+        <div class="input-group mb-3">
+            <span class="input-group-text">Treść</span>
+            <textarea class="form-control" aria-label="With textarea" readonly>{{ pomysl.tresc }}</textarea>
         </div>
+    
+        <div class="input-group mb-3">
+            <label class="input-group-text" for="inputGroupSelect01">Kategoria</label>
+            <select class="form-select" id="inputGroupSelect01" disabled>
+                <option selected>{{ pomysl.kategoria }}</option>
+                {% for i in kategorie %}
+                <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    
+        <div class="input-group mb-3">
+            <label class="input-group-text" for="inputGroupSelect01">Kto może oceniać</label>
+            <select class="form-select" id="inputGroupSelect01" disabled>
+                <option selected>{{ pomysl.kto_moze_oceniac }}</option>
+                {% for i in role %}
+                <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <img src="{{ pomysl.plik }}" class="img-fluid rounded-start" alt="...">
+        </div>
+        <p class="card-text"><small class="text-muted">{{ pomysl.data|date:'d.m.Y' }}</small></p>
+
         <div class="col-md-8">
-            <a class="mt-3 mb-3 btn btn-primary" href="{% url 'dodaj-komentarz' %}?pomysl_id={{ pomysl_id }}" role="button">Skomentuj</a>
+            <a class="mt-3 mb-3 btn btn-primary" href="{% url 'dodaj-komentarz' %}?pomysl_id={{ pomysl.id }}" role="button">Skomentuj</a>
         </div>
       {% for komGleb in komentarzeGlebokosc %}
         <div class="card mb-3" style="max-width: 540px;margin-left: {% widthratio 100 1 komGleb.1 %}px;">
