@@ -13,23 +13,19 @@
         <div class="col-md-8">
             <a class="mt-3 mb-3 btn btn-primary" href="{% url 'dodaj-komentarz' %}?pomysl_id={{ pomysl_id }}" role="button">Skomentuj</a>
         </div>
-      {% for komentarz in komentarze %}
-        {% if komentarz.rodzic %}
-        <div class="card mb-3" style="max-width: 540px;margin-left: 100px;">
-        {% else %}
-        <div class="card mb-3" style="max-width: 540px;">
-        {% endif %}
+      {% for komGleb in komentarzeGlebokosc %}
+        <div class="card mb-3" style="max-width: 540px;margin-left: {% widthratio 100 1 komGleb.1 %}px;">
           <div class="row g-0">
               <div class="card-body">
-                {{komentarz.uzytkownik}}, {{komentarz.data}}
+                {{komGleb.0.uzytkownik}}, {{komGleb.0.data}}
                   <div class="row g-0" style="padding-left: 5%; padding-top: 10px;">
-                      {{komentarz.tresc}}
+                      {{komGleb.0.tresc}}
                   </div>
               </div>
           </div>
           <div class="row g-0">
             <div class="col-md-8">
-                <a class="mt-3 mb-3 btn btn-primary" href="{% url 'dodaj-komentarz' %}?pomysl_id={{ pomysl_id }}&komentarz_id={{ komentarz.pk }}" role="button">Odpowiedz</a>
+                <a class="mt-3 mb-3 btn btn-primary" href="{% url 'dodaj-komentarz' %}?pomysl_id={{ pomysl_id }}&komentarz_id={{ komGleb.0.pk }}" role="button">Odpowiedz</a>
             </div>           
           </div>
         </div>

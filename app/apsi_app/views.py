@@ -239,10 +239,16 @@ def usun_glosowanie(request):
 def komentarze(request):
     pomysl_id = request.GET['pomysl_id']
     pomysl = Pomysl.objects.get(pk=pomysl_id)
-    komentarze = Komentarz.objects.filter(pomysl=pomysl_id).order_by('-rodzic');
+    komentarzeDoPomyslu = Komentarz.objects.filter(pomysl=pomysl_id,rodzic=None)
     
+    komentarzeGlebokosc = []
+    for k in komentarzeDoPomyslu:
+        _r = k.get_children_with_depths()
+        if 0 < len(_r):
+            komentarzeGlebokosc.extend(_r)
+
     context = {
-        'komentarze': komentarze,
+        'komentarzeGlebokosc': komentarzeGlebokosc,
         'pomysl': pomysl,
         'pomysl_id': pomysl_id,
     }
