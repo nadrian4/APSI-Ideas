@@ -1,0 +1,53 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+<h1>Utwórz głosowanie</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <label for="konkursy" class="form-label">Wybierz konkurs dla głosowania</label>
+    <div class="list-group" id="konkursy">
+    {% for konkurs in konkursy %}
+        {% if wybrany_konkurs.id == konkurs.id %}
+        <button type="submit" name="wybierz_konkurs" value="{{konkurs.id}}" class="list-group-item list-group-item-action active" aria-current="true">{{ konkurs.nazwa }}</button>
+        {% else %}
+        <button type="submit" name="wybierz_konkurs" value="{{konkurs.id}}" class="list-group-item list-group-item-action">{{ konkurs.nazwa }}</button>
+        {% endif %}
+    {% endfor %}
+    </div>
+</form>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label for="pomysly" class="form-label mt-3">Wybierz pomysły dla głosowania</label>
+    <ul class="list-group" id="pomysly">
+    {% for pomysl in pomysly %}
+        <li class="list-group-item">
+            <input class="form-check-input me-1" type="checkbox" name="pomysly" value="{{pomysl.id}}" id="pomysl{{pomysl.id}}">
+            <label class="form-check-label stretched-link" for="pomysl{{pomysl.id}}">{{ pomysl.tytul }}</label>
+        </li>
+    {% endfor %}
+    </ul>
+
+    <div class="mt-3 mb-3">
+        <label for="nazwa" class="form-label">Nazwa</label>
+        <input type="text" class="form-control" id="nazwa" name="nazwa">
+    </div>
+
+    <label for="do_n" class="form-label mt-3">Dopuszczalny zakres ocen</label>
+    <div class="input-group">
+        <span class="input-group-text" id="inputGroup-sizing-default">1 do</span>
+        <input type="text" class="form-control" id="do_n" name="max_glos" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+    </div>
+    
+    <div class="mt-3 mb-3">
+        <label for="Input1" class="form-label">Data zakończenia głosowania</label>
+        <input type="text" class="form-control" id="Input1" name="data_koniec" placeholder="Data zakończenia głosowania">
+    </div>
+
+    <button type="submit" name="utworz_glosowanie" class="btn btn-primary mt-3">Utwórz głosowanie</button>
+</form>
+
+{% endblock content %}

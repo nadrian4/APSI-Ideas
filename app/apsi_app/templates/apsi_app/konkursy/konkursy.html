@@ -1,0 +1,43 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+<div class="row mt-4">
+  <div class="col" style="max-width: 700px;">
+    {% for konkurs in konkursy %}
+      <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+          <div class="col-md-8">
+            <div class="card-body">
+                <h5><a href="{% url 'strona-konkursu' %}?konkurs_id={{ konkurs.id }}">{{ konkurs.nazwa }}</a></h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <div class="col" style="max-width: 200px;">
+    <nav class="sticky-top">
+      <a class="mb-3 btn btn-primary" href="{% url 'utworz-konkurs' %}" role="button">Utwórz konkurs</a>
+
+      <ul class="pagination">
+        {% if konkursy.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ konkursy.previous_page_number }}">Poprzedni</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link">Poprzedni</a></li>
+        {% endif %}
+
+        {% for i in konkursy.paginator.page_range %}
+            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+        {% endfor %}
+
+        {% if konkursy.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ konkursy.next_page_number }}">Następny</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link">Następny</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</div>
+
+{% endblock content %}

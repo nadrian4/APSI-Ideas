@@ -14,13 +14,21 @@ ROLE = (
 )
 
 
+class Konkurs(models.Model):
+    nazwa = models.CharField(max_length=20)
+    data_koniec = models.DateField()
+
+    def __str__(self):
+        return self.nazwa
+
+
 class Glosowanie(models.Model):
     nazwa = models.CharField(max_length=20)
     max_glos = models.IntegerField()
-    data_koniec = models.DateField(default=timezone.now)
+    data_koniec = models.DateField()
 
     def __str__(self):
-            return self.nazwa
+        return self.nazwa
 
 
 class Pomysl(models.Model):
@@ -32,6 +40,7 @@ class Pomysl(models.Model):
     data = models.DateField(default=timezone.now)
     srednia_ocen = models.IntegerField(default=0)
     uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
+    konkurs = models.ForeignKey(Konkurs, null=True, on_delete=models.SET_NULL)
     
     def __str__(self):
         return self.tytul
