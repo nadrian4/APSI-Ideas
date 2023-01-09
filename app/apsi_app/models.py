@@ -60,10 +60,19 @@ class Glos(models.Model):
 
 class Komentarz(models.Model):
     tresc = models.CharField(max_length=200)
-    data = models.DateField(default=timezone.now)
+    data = models.DateTimeField(default=timezone.now)
     uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
     rodzic = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
     pomysl = models.ForeignKey(Pomysl, on_delete=models.CASCADE)
+
+    def get_children_with_depths(self, depth=0):
+        r = []
+        r.append([self, depth])
+        for c in Komentarz.objects.filter(rodzic=self):
+            _r = c.get_children_with_depths(depth=depth+1)
+            if 0 < len(_r):
+                r.extend(_r)
+        return r
 
     def __str__(self):
         return self.tresc
