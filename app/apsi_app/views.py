@@ -71,6 +71,7 @@ def konkursy(request):
 
 def strona_konkursu(request):
     konkurs = Konkurs.objects.get(pk=request.GET['konkurs_id'])
+    pomysly_uzytkownika = Pomysl.objects.filter(uzytkownik=request.user)
 
     if request.method == 'POST':
         wybrane_pomysly_id = request.POST.getlist('pomysly')
@@ -80,6 +81,14 @@ def strona_konkursu(request):
             for pomysl in wybrane_pomysly:
                 pomysl.konkurs = konkurs
                 pomysl.save()
+
+        odznaczone_pomysly = [pomysl for pomysl in pomysly_uzytkownika if pomysl not in wybrane_pomysly]
+
+        with transaction.atomic():
+            for pomysl in odznaczone_pomysly:
+                if pomysl.konkurs == konkurs:
+                    pomysl.konkurs = None
+                    pomysl.save()
 
     pomysly_konkursu = Pomysl.objects.filter(konkurs=konkurs)
     pomysly_uzytkownika = Pomysl.objects.filter(uzytkownik=request.user)
