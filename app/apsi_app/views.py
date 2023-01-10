@@ -224,16 +224,21 @@ def glosowania(request):
         'page': page
     }
 
-    return render(request, 'apsi_app/glosowania/glosowania.html', context)
+    if request.user.groups.filter(name='Członek komisji'):
+        return render(request, 'apsi_app/glosowania/glosowania.html', context)
+    else:
+        return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Członek komisji'})
 
 
 def utworz_glosowanie(request):
     if request.method == 'POST':
         if 'wybierz_konkurs' in request.POST:
             wybrany_konkurs = Konkurs.objects.get(pk=request.POST['wybierz_konkurs'])
+            pomysly = Pomysl.objects.filter(konkurs=wybrany_konkurs)
+            pomysly_oceny = [{'pomysl': pomysl, 'liczba_ocen': len(Ocena.objects.filter(pomysl=pomysl))} for pomysl in pomysly]
 
             context = {
-                'pomysly': Pomysl.objects.filter(konkurs=wybrany_konkurs),
+                'pomysly_oceny': pomysly_oceny,
                 'konkursy': Konkurs.objects.all(),
                 'wybrany_konkurs': wybrany_konkurs
             }
