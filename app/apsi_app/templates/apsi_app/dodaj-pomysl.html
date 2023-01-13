@@ -35,44 +35,17 @@
     </div>
 
     <div class="mb-3">
-        <!-- <label for="formFile" class="form-label">Default file input example</label> -->
+        <label for="formFile" class="form-label">Wybierz obraz dla pomysłu</label>
         <input class="form-control" type="file" id="formFile" name="{{ pomysl_form.plik.name }}">
     </div>
 
+    <div class="mb-3">
+        <label for="formFileMultiple" class="form-label">Wybierz pliki dla pomysłu</label>
+        <input class="form-control" type="file" id="formFileMultiple" name="wiele_plikow" multiple>
+    </div>
+
     <button type="submit" class="btn btn-primary">Dodaj pomysł</button>
-
-    <!-- <div class="mb-3">
-        <label for="exampleFormControlInput1" class="form-label">Tytuł</label>
-        <input type="text" class="form-control" id="exampleFormControlInput1" name="tytul" placeholder="Tytuł">
-    </div>
-
-
-    <div class="mb-3">
-        <label for="exampleFormControlTextarea1" class="form-label">Treść</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" name="tresc" rows="3"></textarea>
-    </div>
-
-    <div class="mb-3">
-        <label for="kategoria" class="form-label">Kategoria</label>
-        <select id="kategoria" name="kategoria" class="form-select" aria-label="Default select example">
-            <option selected>Wybierz kategorię</option>
-            {% for i in kategorie %}
-            <option value="{{ i }}">{{ i }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label for="kto_moze_oceniac" class="form-label">Kto może oceniać</label>
-        <select id="kto_moze_oceniac" name="kto_moze_oceniac" class="form-select" aria-label="Default select example">
-            <option selected>Wybierz kategorię</option>
-            {% for i in kto_moze_oceniac %}
-            <option value="{{ i }}">{{ i }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Dodaj pomysł</button> -->
 </form>
+
 
 {% endblock content %}
