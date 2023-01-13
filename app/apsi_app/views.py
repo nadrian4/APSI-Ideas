@@ -159,15 +159,6 @@ def dodaj_pomysl(request):
             inst.uzytkownik = request.user
             inst.save()
 
-            # tytul = pomysl_form.cleaned_data['tytul']
-            # tresc = pomysl_form.cleaned_data['tresc']
-            # kategoria = pomysl_form.cleaned_data['kategoria']
-            # kto_moze_oceniac = pomysl_form.cleaned_data['kto_moze_oceniac']
-            # plik = pomysl_form.cleaned_data['plik']
-
-            # pomysl = Pomysl(tytul=tytul, tresc=tresc, kategoria=kategoria, kto_moze_oceniac=kto_moze_oceniac, uzytkownik=request.user)
-            # pomysl.save()
-
             return redirect('index')
         else:
             print('form invalid')
@@ -181,26 +172,6 @@ def dodaj_pomysl(request):
     }
 
     return render(request, 'apsi_app/dodaj-pomysl.html', context)
-
-    # if request.method == 'POST':
-    #     tytul = request.POST['tytul']
-    #     tresc = request.POST['tresc']
-    #     kategoria = request.POST['kategoria']
-    #     kto_moze_oceniac = request.POST['kto_moze_oceniac']
-
-    #     pomysl = Pomysl(tytul=tytul, kategoria=kategoria, kto_moze_oceniac=kto_moze_oceniac, tresc=tresc, uzytkownik=request.user)
-    #     pomysl.save()
-    #     return redirect('index')
-    # else:
-    #     kategorie = ['Edukacja', 'Życie społeczne', 'Infrastruktura']
-    #     kto_moze_oceniac = ['Student', 'Pracownik', 'Wszyscy']
-
-    #     context = {
-    #         'kategorie': kategorie,
-    #         'kto_moze_oceniac': kto_moze_oceniac
-    #     }
-
-    #     return render(request, 'apsi_app/dodaj-pomysl.html', context)
 
 
 def usun_pomysl(request):
