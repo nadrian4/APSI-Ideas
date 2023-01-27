@@ -228,7 +228,8 @@ def utworz_glosowanie(request):
             glosowanie = Glosowanie(nazwa=nazwa, max_glos=max_glos, data_koniec=data_koniec)
 
             with transaction.atomic():
-                glosowanie.save()
+                if max_glos != 0 and len(nazwa) != 0 and len(data_koniec) != 0:
+                    glosowanie.save()
 
                 for pomysl in wybrane_pomysly:
                     glosowanie_pomysl = GlosowaniePomysl(glosowanie=glosowanie, pomysl=pomysl, srednia_glosow=0)
