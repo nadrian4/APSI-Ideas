@@ -217,7 +217,6 @@ def utworz_glosowanie(request):
             return render(request, 'apsi_app/glosowania/utworz-glosowanie.html', context)
         elif 'utworz_glosowanie' in request.POST:
             nazwa = request.POST['nazwa']
-            max_glos = request.POST['max_glos']
             data_koniec = request.POST['data_koniec']
             wybrane_pomysly_id = request.POST.getlist('pomysly')
             wybrane_pomysly = []
@@ -225,6 +224,7 @@ def utworz_glosowanie(request):
             for id in wybrane_pomysly_id:
                 wybrane_pomysly.append(Pomysl.objects.get(pk=id))
 
+            max_glos = len(wybrane_pomysly)
             glosowanie = Glosowanie(nazwa=nazwa, max_glos=max_glos, data_koniec=data_koniec)
 
             with transaction.atomic():
@@ -244,6 +244,7 @@ def utworz_glosowanie(request):
 
 
 def strona_glosowania(request):
+    glosy = {}
     if request.method == 'POST':
         glosowanie = Glosowanie.objects.get(pk=request.POST['glosowanie_id'])
         pomysl = Pomysl.objects.get(pk=request.POST['pomysl_id'])
@@ -261,6 +262,7 @@ def strona_glosowania(request):
         glosy_pomysl = Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl)
         glosy_pomysl = [g.glos for g in glosy_pomysl]
         glosy_pomysl_mean = sum(glosy_pomysl) / len(glosy_pomysl)
+        glosy = glosy_pomysl
 
         glosowanie_pomysl = GlosowaniePomysl.objects.get(glosowanie=glosowanie, pomysl=pomysl)
         glosowanie_pomysl.srednia_glosow = glosy_pomysl_mean
@@ -274,7 +276,10 @@ def strona_glosowania(request):
     for glosowanie_pomysl in glosowanie_pomysl_list:
         pomysly_srednia_glos.append({'pomysl': glosowanie_pomysl.pomysl, 'glos': glosowanie_pomysl.srednia_glosow})
 
-    glos_list = list(range(1, glosowanie.max_glos + 1))
+    glos_list = []
+    for i in range(1, glosowanie.max_glos + 1):
+        if i not in glosy:
+            glos_list.append(i)
 
     context = {
         'glosowanie': glosowanie,
