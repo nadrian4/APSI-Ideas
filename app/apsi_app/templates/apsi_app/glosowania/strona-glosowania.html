@@ -6,7 +6,6 @@
         <h1 class="display-6 mt-3">{{ glosowanie.nazwa }}</h1>
         <a class="mt-3 mb-3 btn btn-danger" href="{% url 'usun-glosowanie' %}?glosowanie_id={{ glosowanie.id }}" role="button">Usuń głosowanie</a>
         <button type="submit" name="wyczysc_glosy" class="mt-3 mb-3 btn btn-danger" aria-current="true">Wyczyść głosy</button>
-        </div>
     </form>
 
 {% for pomysl in pomysly_srednia_glos %}
