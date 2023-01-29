@@ -290,11 +290,13 @@ def strona_glosowania(request):
         if i not in glosy:
             glos_list.append(i)
 
+    glosy = Glos.objects.filter(glosowanie=glosowanie, uzytkownik=uzytkownik)
     context = {
         'glosowanie': glosowanie,
         'glosowanie_id': glosowanie_id,
         'pomysly_srednia_glos': pomysly_srednia_glos,
-        'glos_list': glos_list
+        'glos_list': glos_list,
+        'glosy': glosy
     }
 
     return render(request, 'apsi_app/glosowania/strona-glosowania.html', context)

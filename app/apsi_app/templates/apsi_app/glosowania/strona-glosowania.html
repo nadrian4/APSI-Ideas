@@ -39,6 +39,15 @@
                   {% endfor %}
                 </select>
             </div>
+
+            <div class="col">
+               {% for glos in glosy %}
+                   {% if glos.pomysl.id == pomysl.pomysl.id and glos.glos is not None %}
+                       <span type="submit" class="badge bg-secondary">{{glos.glos}}</span>
+                   {%  endif %}
+               {% endfor %}
+            </div>
+
             <div class="col">
                 <button type="submit" class="btn btn-primary">Głosuj</button>
             </div>
