@@ -14,6 +14,22 @@
         <textarea class="form-control" aria-label="With textarea" name="{{ pomysl_form.tresc.name }}"></textarea>
     </div>
 
+    <div class="form-floating mb-3">
+        <textarea class="form-control" id="planowane_korzysci" style="height: 100px" name="{{ pomysl_form.planowane_korzysci.name }}"></textarea>
+        <label for="planowane_korzysci">Planowane korzyści</label>
+    </div>
+
+    <div class="input-group mb-3">
+        <span class="input-group-text">Określ planowane koszty</span>
+        <input type="text" class="form-control" name="{{ pomysl_form.planowane_koszty.name }}">
+        <span class="input-group-text">zł</span>
+    </div>
+
+    <div class="mb-3">
+        <label for="slowakluczowe" class="form-label">Dodaj słowa kluczowe</label>
+        <input type="text" class="form-control" id="slowakluczowe" name="slowakluczowe">
+    </div>
+
     <div class="input-group mb-3">
         <label class="input-group-text" for="inputGroupSelect01">Kategoria</label>
         <select class="form-select" id="inputGroupSelect01" name="{{ pomysl_form.kategoria.name }}">
@@ -44,8 +60,7 @@
         <input class="form-control" type="file" id="formFileMultiple" name="wiele_plikow" multiple>
     </div>
 
-    <button type="submit" class="btn btn-primary">Dodaj pomysł</button>
+    <button type="submit" name="dodaj_pomysl" class="btn btn-primary">Dodaj pomysł</button>
 </form>
-
 
 {% endblock content %}

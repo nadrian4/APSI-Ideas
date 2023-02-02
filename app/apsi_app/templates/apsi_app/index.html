@@ -11,7 +11,14 @@
           </div>
           <div class="col-md-8">
             <div class="card-body">
-              <h5 class="card-title">{{ pomysl_kto_moze_oceniac.pomysl.tytul }} <span class="badge bg-secondary">{{ pomysl_kto_moze_oceniac.pomysl.kategoria }}</span></h5>
+              {% for pomysl_slowo_kluczowe in pomysl_kto_moze_oceniac.slowa_kluczowe %}
+                <span class="badge text-bg-secondary">{{ pomysl_slowo_kluczowe }}</span>
+              {% endfor %}
+              <div>
+                <a href="{% url 'komentarze' %}?pomysl_id={{ pomysl_kto_moze_oceniac.pomysl.pk }}" class="link-primary">{{ pomysl_kto_moze_oceniac.pomysl.tytul }}</a>
+                <span class="badge text-bg-secondary">{{ pomysl_kto_moze_oceniac.pomysl.kategoria }}</span>
+              </div>
+              
               <p class="card-text">{{ pomysl_kto_moze_oceniac.pomysl.tresc }}</p>
               <p class="card-text"><small class="text-muted">{{ pomysl_kto_moze_oceniac.pomysl.data|date:'d.m.Y' }}</small></p>
 
@@ -53,9 +60,9 @@
                 <div class="progress-bar" role="progressbar" aria-label="Basic example" style="width: {{ pomysl_kto_moze_oceniac.pomysl.srednia_ocen }}%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
               </div>
 
-              <div class="col-md-8">
+              <!-- <div class="col-md-8">
                 <a class="mt-3 mb-3 btn btn-primary" href="{% url 'komentarze' %}?pomysl_id={{ pomysl_kto_moze_oceniac.pomysl.pk }}" role="button">Komentarze</a>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
