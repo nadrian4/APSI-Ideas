@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.db import transaction
 
-from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz, SlowoKluczowe, PomyslSlowoKluczowe
+from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz
 from .models import KATEGORIE, ROLE
 from .forms import PomyslForm
 
@@ -32,7 +32,6 @@ def index(request):
     page = request.GET.get('page')
     pomysly = paginator.get_page(page)
     pomysly_kto_moze_oceniac = []
-    pomysly_slowa_kluczowe = []
 
     user_groups = request.user.groups.all()
 
@@ -42,14 +41,7 @@ def index(request):
         if user_groups[0].__str__() == pomysl.kto_moze_oceniac or pomysl.kto_moze_oceniac == 'Wszyscy':
             moze_oceniac = True
 
-        pomysl_slowa_kluczowe = PomyslSlowoKluczowe.objects.filter(pomysl=pomysl)
-        pomysly_kto_moze_oceniac.append({
-            'pomysl': pomysl,
-            'moze_oceniac': moze_oceniac,
-            'slowa_kluczowe': [x.slowo_kluczowe.nazwa for x in pomysl_slowa_kluczowe]
-        })
-
-    print(pomysly_kto_moze_oceniac)
+        pomysly_kto_moze_oceniac.append({'pomysl': pomysl, 'moze_oceniac': moze_oceniac})
 
     context = {
         'pomysly': pomysly,
@@ -161,25 +153,17 @@ def profile(request):
 def dodaj_pomysl(request):
     if request.method == 'POST':
         pomysl_form = PomyslForm(request.POST, request.FILES)
-        print(request.POST['slowakluczowe'].split(', '))
 
         if pomysl_form.is_valid():
-            with transaction.atomic():
-                pomysl = pomysl_form.save(commit=False)
-                pomysl.uzytkownik = request.user
-                pomysl.save()
-
-                for slowo_kluczowe in request.POST['slowakluczowe'].split(', '):
-                    slowo_kluczowe_model = SlowoKluczowe(nazwa=slowo_kluczowe)
-                    slowo_kluczowe_model.save()
-                    pomysl_slowo_kluczowe = PomyslSlowoKluczowe(pomysl=pomysl, slowo_kluczowe=slowo_kluczowe_model)
-                    pomysl_slowo_kluczowe.save()
+            inst = pomysl_form.save(commit=False)
+            inst.uzytkownik = request.user
+            inst.save()
 
             return redirect('index')
         else:
             print('form invalid')
-
-    pomysl_form = PomyslForm()
+    else:
+        pomysl_form = PomyslForm()
 
     context = {
         'pomysl_form': pomysl_form,

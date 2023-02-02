@@ -3,7 +3,7 @@
 
 <div class="row mt-4">
     <div class="col" style="max-width: 700px;">
-        <!-- <div class="input-group mb-3">
+        <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon1">Tytuł</span>
             <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1" value="{{ pomysl.tytul }}" readonly>
         </div>      
@@ -12,25 +12,7 @@
             <span class="input-group-text">Treść</span>
             <textarea class="form-control" aria-label="With textarea" readonly>{{ pomysl.tresc }}</textarea>
         </div>
-
-        <div class="mb-3">
-            <label for="planowanekorzysci" class="form-label">{{ pomysl.planowane_korzysci }}</label>
-            <input type="text" class="form-control" id="planowanekorzysci" name="planowane_korzysci" readonly>{{ pomysl.planowane_korzysci }}</input>
-        </div>
-
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" name="{{ pomysl_form.planowane_koszty.name }}" readonly>{{ pomysl.planowane_koszty }}</input>
-            <span class="input-group-text">zł</span>
-        </div> -->
-
-        <h1 class="display-1">{{ pomysl.tytul }}</h1>
-        <h1 class="display-6">Treść</h1>
-        <p>{{ pomysl.tresc }}</p>
-        <h1 class="display-6">Planowane korzyści</h1>
-        <p>{{ pomysl.planowane_korzysci }}</p>
-        <h1 class="display-6">Planowane koszty</h1>
-        <p>{{ pomysl.planowane_koszty }} zł</p>
-
+    
         <!-- <div class="input-group mb-3">
             <label class="input-group-text" for="inputGroupSelect01">Kategoria</label>
             <select class="form-select" id="inputGroupSelect01" disabled>

@@ -34,8 +34,6 @@ class Glosowanie(models.Model):
 class Pomysl(models.Model):
     tytul = models.CharField(max_length=20)
     tresc = models.CharField(max_length=200)
-    planowane_korzysci = models.CharField(max_length=200)
-    planowane_koszty = models.FloatField()
     kategoria = models.CharField(max_length=20, choices=KATEGORIE)
     kto_moze_oceniac = models.CharField(max_length=20, choices=ROLE)
     plik = models.ImageField(upload_to='app/apsi_app/pliki/pomysl-pliki', null=True)
@@ -46,18 +44,6 @@ class Pomysl(models.Model):
     
     def __str__(self):
         return self.tytul
-
-
-class SlowoKluczowe(models.Model):
-    nazwa = models.CharField(max_length=20)
-
-    def __str__(self) -> str:
-        return self.nazwa
-
-
-class PomyslSlowoKluczowe(models.Model):
-    pomysl = models.ForeignKey(Pomysl, on_delete=models.CASCADE)
-    slowo_kluczowe = models.ForeignKey(SlowoKluczowe, on_delete=models.CASCADE)
 
 
 class GlosowaniePomysl(models.Model):
