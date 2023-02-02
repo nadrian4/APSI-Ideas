@@ -71,8 +71,6 @@ class Glos(models.Model):
     pomysl = models.ForeignKey(Pomysl, on_delete=models.CASCADE)
     uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
     glos = models.IntegerField()
-    def __str__(self):
-        return self.glosowanie.__str__() + ', ' + self.pomysl.__str__() + ', ' + self.glos.__str__()
 
 class Komentarz(models.Model):
     tresc = models.CharField(max_length=200)
