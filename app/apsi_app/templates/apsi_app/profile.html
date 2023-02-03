@@ -31,8 +31,10 @@
                 <p class="card-text">{{ pomysl.tresc }}</p>
               </div>
             </div>
-            <div class="col-md-3">
-                <a class="mt-3 mb-3 btn btn-danger" href="{% url 'usun-pomysl' %}?pomysl_id={{ pomysl.id }}" role="button">Usuń pomysł</a>
+
+            <div class="btn-group" style="max-width: 300px;">
+              <a href="{% url 'usun-pomysl' %}?pomysl_id={{ pomysl.id }}" class="btn btn-danger">Usuń pomysł</a>
+              <a href="{% url 'edytuj-pomysl' %}?pomysl_id={{ pomysl.id }}" class="btn btn-primary">Edytuj pomysł</a>
             </div>
           </div>
         </div>
