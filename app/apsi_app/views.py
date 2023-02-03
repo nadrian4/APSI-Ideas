@@ -201,6 +201,28 @@ def usun_pomysl(request):
     return render(request, 'apsi_app/usun-pomysl.html')
 
 
+def edytuj_pomysl(request):
+    pomysl = Pomysl.objects.get(pk=request.GET['pomysl_id'])
+
+    if request.method == 'POST':
+        pomysl.tytul = request.POST['tytul']
+        pomysl.tresc = request.POST['tresc']
+        pomysl.planowane_korzysci = request.POST['planowane_korzysci']
+        pomysl.planowane_koszty = request.POST['planowane_koszty']
+        pomysl.kategoria = request.POST['kategoria']
+        pomysl.kto_moze_oceniac = request.POST['kto_moze_oceniac']
+        pomysl.save()
+        return redirect('profile')
+
+    context = {
+        'pomysl': pomysl,
+        'kategorie': [k[1] for k in KATEGORIE],
+        'role': [r[1] for r in ROLE],
+    }
+
+    return render(request, 'apsi_app/edytuj-pomysl.html', context)
+
+
 def glosowania(request):
     paginator = Paginator(Glosowanie.objects.all().order_by('data_koniec'), 5)
     page = request.GET.get('page')
