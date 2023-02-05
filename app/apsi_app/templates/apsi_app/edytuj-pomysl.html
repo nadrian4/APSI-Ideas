@@ -6,22 +6,22 @@
 
     <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1">Tytuł</span>
-        <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1" name="{{ pomysl_form.tytul.name }}">
+        <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1" name="tytul" value="{{ pomysl.tytul }}">
     </div>      
 
     <div class="input-group mb-3">
         <span class="input-group-text">Treść</span>
-        <textarea class="form-control" aria-label="With textarea" name="{{ pomysl_form.tresc.name }}"></textarea>
+        <textarea class="form-control" aria-label="With textarea" name="tresc">{{ pomysl.tresc }}</textarea>
     </div>
 
     <div class="form-floating mb-3">
-        <textarea class="form-control" id="planowane_korzysci" style="height: 100px" name="{{ pomysl_form.planowane_korzysci.name }}"></textarea>
+        <textarea class="form-control" id="planowane_korzysci" style="height: 100px" name="planowane_korzysci">{{ pomysl.planowane_korzysci }}</textarea>
         <label for="planowane_korzysci">Planowane korzyści</label>
     </div>
 
     <div class="input-group mb-3">
         <span class="input-group-text">Określ planowane koszty</span>
-        <input type="text" class="form-control" name="{{ pomysl_form.planowane_koszty.name }}">
+        <input type="text" class="form-control" name="planowane_koszty" value="{{ pomysl.planowane_koszty }}">
         <span class="input-group-text">zł</span>
     </div>
 
@@ -32,8 +32,8 @@
 
     <div class="input-group mb-3">
         <label class="input-group-text" for="inputGroupSelect01">Kategoria</label>
-        <select class="form-select" id="inputGroupSelect01" name="{{ pomysl_form.kategoria.name }}">
-            <option selected>Wybierz...</option>
+        <select class="form-select" id="inputGroupSelect01" name="kategoria">
+            <option selected>{{ pomysl.kategoria }}</option>
             {% for i in kategorie %}
             <option value="{{ i }}">{{ i }}</option>
             {% endfor %}
@@ -42,8 +42,8 @@
 
     <div class="input-group mb-3">
         <label class="input-group-text" for="inputGroupSelect01">Kto może oceniać</label>
-        <select class="form-select" id="inputGroupSelect01" name="{{ pomysl_form.kto_moze_oceniac.name }}">
-            <option selected>Wybierz...</option>
+        <select class="form-select" id="inputGroupSelect01" name="kto_moze_oceniac">
+            <option selected>{{ pomysl.kto_moze_oceniac }}</option>
             {% for i in role %}
             <option value="{{ i }}">{{ i }}</option>
             {% endfor %}
@@ -60,7 +60,7 @@
         <input class="form-control" type="file" id="formFileMultiple" name="wiele_plikow" multiple>
     </div>
 
-    <button type="submit" name="dodaj_pomysl" class="btn btn-primary">Dodaj pomysł</button>
+    <button type="submit" name="edytuj_pomysl" class="btn btn-primary">Zapisz</button>
 </form>
 
 {% endblock content %}

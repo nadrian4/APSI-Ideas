@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.db import transaction
 
-from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz
+from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz, SlowoKluczowe, PomyslSlowoKluczowe
 from .models import KATEGORIE, ROLE
 from .forms import PomyslForm
 
@@ -32,6 +32,7 @@ def index(request):
     page = request.GET.get('page')
     pomysly = paginator.get_page(page)
     pomysly_kto_moze_oceniac = []
+    pomysly_slowa_kluczowe = []
 
     user_groups = request.user.groups.all()
 
@@ -41,7 +42,14 @@ def index(request):
         if user_groups[0].__str__() == pomysl.kto_moze_oceniac or pomysl.kto_moze_oceniac == 'Wszyscy':
             moze_oceniac = True
 
-        pomysly_kto_moze_oceniac.append({'pomysl': pomysl, 'moze_oceniac': moze_oceniac})
+        pomysl_slowa_kluczowe = PomyslSlowoKluczowe.objects.filter(pomysl=pomysl)
+        pomysly_kto_moze_oceniac.append({
+            'pomysl': pomysl,
+            'moze_oceniac': moze_oceniac,
+            'slowa_kluczowe': [x.slowo_kluczowe.nazwa for x in pomysl_slowa_kluczowe]
+        })
+
+    print(pomysly_kto_moze_oceniac)
 
     context = {
         'pomysly': pomysly,
@@ -153,17 +161,25 @@ def profile(request):
 def dodaj_pomysl(request):
     if request.method == 'POST':
         pomysl_form = PomyslForm(request.POST, request.FILES)
+        print(request.POST['slowakluczowe'].split(', '))
 
         if pomysl_form.is_valid():
-            inst = pomysl_form.save(commit=False)
-            inst.uzytkownik = request.user
-            inst.save()
+            with transaction.atomic():
+                pomysl = pomysl_form.save(commit=False)
+                pomysl.uzytkownik = request.user
+                pomysl.save()
+
+                for slowo_kluczowe in request.POST['slowakluczowe'].split(', '):
+                    slowo_kluczowe_model = SlowoKluczowe(nazwa=slowo_kluczowe)
+                    slowo_kluczowe_model.save()
+                    pomysl_slowo_kluczowe = PomyslSlowoKluczowe(pomysl=pomysl, slowo_kluczowe=slowo_kluczowe_model)
+                    pomysl_slowo_kluczowe.save()
 
             return redirect('index')
         else:
             print('form invalid')
-    else:
-        pomysl_form = PomyslForm()
+
+    pomysl_form = PomyslForm()
 
     context = {
         'pomysl_form': pomysl_form,
@@ -183,6 +199,28 @@ def usun_pomysl(request):
         return redirect('profile')
 
     return render(request, 'apsi_app/usun-pomysl.html')
+
+
+def edytuj_pomysl(request):
+    pomysl = Pomysl.objects.get(pk=request.GET['pomysl_id'])
+
+    if request.method == 'POST':
+        pomysl.tytul = request.POST['tytul']
+        pomysl.tresc = request.POST['tresc']
+        pomysl.planowane_korzysci = request.POST['planowane_korzysci']
+        pomysl.planowane_koszty = request.POST['planowane_koszty']
+        pomysl.kategoria = request.POST['kategoria']
+        pomysl.kto_moze_oceniac = request.POST['kto_moze_oceniac']
+        pomysl.save()
+        return redirect('profile')
+
+    context = {
+        'pomysl': pomysl,
+        'kategorie': [k[1] for k in KATEGORIE],
+        'role': [r[1] for r in ROLE],
+    }
+
+    return render(request, 'apsi_app/edytuj-pomysl.html', context)
 
 
 def glosowania(request):
