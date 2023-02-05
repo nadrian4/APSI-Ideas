@@ -255,7 +255,6 @@ def utworz_glosowanie(request):
             return render(request, 'apsi_app/glosowania/utworz-glosowanie.html', context)
         elif 'utworz_glosowanie' in request.POST:
             nazwa = request.POST['nazwa']
-            max_glos = request.POST['max_glos']
             data_koniec = request.POST['data_koniec']
             wybrane_pomysly_id = request.POST.getlist('pomysly')
             wybrane_pomysly = []
@@ -263,10 +262,12 @@ def utworz_glosowanie(request):
             for id in wybrane_pomysly_id:
                 wybrane_pomysly.append(Pomysl.objects.get(pk=id))
 
+            max_glos = len(wybrane_pomysly)
             glosowanie = Glosowanie(nazwa=nazwa, max_glos=max_glos, data_koniec=data_koniec)
 
             with transaction.atomic():
-                glosowanie.save()
+                if max_glos != 0:
+                    glosowanie.save()
 
                 for pomysl in wybrane_pomysly:
                     glosowanie_pomysl = GlosowaniePomysl(glosowanie=glosowanie, pomysl=pomysl, srednia_glosow=0)
@@ -283,26 +284,32 @@ def utworz_glosowanie(request):
 
 def strona_glosowania(request):
     if request.method == 'POST':
-        glosowanie = Glosowanie.objects.get(pk=request.POST['glosowanie_id'])
-        pomysl = Pomysl.objects.get(pk=request.POST['pomysl_id'])
-        uzytkownik = request.user
-
-        if not Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik):
-            glos = Glos(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik, glos=request.POST['glos'])
-            glos.save()
-
+        if 'wyczysc_glosy' in request.POST:
+            glosowanie = Glosowanie.objects.get(pk=request.GET['glosowanie_id'])
+            uzytkownik = request.user
+            glosy_pomysl = Glos.objects.filter(glosowanie=glosowanie, uzytkownik=uzytkownik)
+            glosy_pomysl.delete()
         else:
-            glos = Glos.objects.get(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik)
-            glos.glos = request.POST['glos']
-            glos.save()
-    
-        glosy_pomysl = Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl)
-        glosy_pomysl = [g.glos for g in glosy_pomysl]
-        glosy_pomysl_mean = sum(glosy_pomysl) / len(glosy_pomysl)
+            glosowanie = Glosowanie.objects.get(pk=request.POST['glosowanie_id'])
+            pomysl = Pomysl.objects.get(pk=request.POST['pomysl_id'])
+            uzytkownik = request.user
 
-        glosowanie_pomysl = GlosowaniePomysl.objects.get(glosowanie=glosowanie, pomysl=pomysl)
-        glosowanie_pomysl.srednia_glosow = glosy_pomysl_mean
-        glosowanie_pomysl.save()
+            if not Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik):
+                glos = Glos(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik, glos=request.POST['glos'])
+                glos.save()
+
+            else:
+                glos = Glos.objects.get(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik)
+                glos.glos = request.POST['glos']
+                glos.save()
+
+            glosy_pomysl = Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik)
+            glosy_pomysl = [g.glos for g in glosy_pomysl]
+            glosy_pomysl_mean = sum(glosy_pomysl) / len(glosy_pomysl)
+
+            glosowanie_pomysl = GlosowaniePomysl.objects.get(glosowanie=glosowanie, pomysl=pomysl)
+            glosowanie_pomysl.srednia_glosow = glosy_pomysl_mean
+            glosowanie_pomysl.save()
 
     glosowanie_id = request.GET['glosowanie_id']
     glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
@@ -312,19 +319,38 @@ def strona_glosowania(request):
     for glosowanie_pomysl in glosowanie_pomysl_list:
         pomysly_srednia_glos.append({'pomysl': glosowanie_pomysl.pomysl, 'glos': glosowanie_pomysl.srednia_glosow})
 
-    glos_list = list(range(1, glosowanie.max_glos + 1))
+    glosowanie = Glosowanie.objects.get(pk=request.GET['glosowanie_id'])
+    uzytkownik = request.user
+    glosy = Glos.objects.filter(glosowanie=glosowanie, uzytkownik=uzytkownik)
+    glosy = [g.glos for g in glosy]
+    glos_list = []
+    for i in range(1, glosowanie.max_glos + 1):
+        if i not in glosy:
+            glos_list.append(i)
 
+    glosy = Glos.objects.filter(glosowanie=glosowanie, uzytkownik=uzytkownik)
     context = {
         'glosowanie': glosowanie,
         'glosowanie_id': glosowanie_id,
         'pomysly_srednia_glos': pomysly_srednia_glos,
-        'glos_list': glos_list
+        'glos_list': glos_list,
+        'glosy': glosy
     }
 
     return render(request, 'apsi_app/glosowania/strona-glosowania.html', context)
 
 
 def usun_glosowanie(request):
+    if request.method == 'POST':
+        glosowanie_id = request.GET['glosowanie_id']
+        glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
+        glosowanie.delete()
+
+        return redirect('glosowania')
+
+    return render(request, 'apsi_app/glosowania/usun-glosowanie.html')
+
+def wyczysc_glosy(request):
     if request.method == 'POST':
         glosowanie_id = request.GET['glosowanie_id']
         glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
