@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import KATEGORIE, ROLE, Pomysl
+from .models import KATEGORIE, ROLE, Pomysl, Watek
 from django.contrib.auth.models import User
 
 
@@ -16,3 +16,11 @@ class PomyslForm(forms.ModelForm):
     class Meta:
         model = Pomysl
         fields = ['tytul', 'tresc', 'planowane_korzysci', 'planowane_koszty', 'kategoria', 'kto_moze_oceniac', 'plik']
+
+class WatekForm(forms.ModelForm):
+    tytul = forms.CharField(max_length=100)
+    tresc = forms.CharField(max_length=400)
+
+    class Meta:
+        model = Watek
+        fields = ['tytul', 'tresc']

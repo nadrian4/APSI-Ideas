@@ -1,0 +1,22 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="input-group mb-3">
+        <span class="input-group-text" id="basic-addon1">Tytuł</span>
+        <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1" name="{{ watek_form.tytul.name }}">
+    </div>      
+
+
+    <div class="form-floating mb-3">
+        <textarea class="form-control" id="tresc" style="height: 300px" name="{{ watek_form.tresc.name }}"></textarea>
+        <label for="planowane_korzysci">Treść pierwszego wpisu</label>
+    </div>
+
+
+    <button type="submit" name="dodaj-watek" class="btn btn-primary">Utwórz wątek</button>
+</form>
+
+{% endblock content %}

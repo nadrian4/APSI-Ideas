@@ -98,3 +98,20 @@ class Ocena(models.Model):
 
     def __str__(self):
         return self.pomysl.__str__() + ', ' + str(self.ocena)
+
+class Watek(models.Model):
+    tytul = models.CharField(max_length=100)
+    data = models.DateTimeField(default=timezone.now)
+    uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def getPostCount(self):
+        return ForumPost.objects.filter(watek=self).count()
+
+    def getRecentPost(self):
+        return ForumPost.objects.filter(watek=self).latest('data')
+
+class ForumPost(models.Model):
+    tresc = models.CharField(max_length=400)
+    data = models.DateTimeField(default=timezone.now)
+    uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
+    watek = models.ForeignKey(Watek, on_delete=models.CASCADE)
