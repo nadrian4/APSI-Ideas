@@ -23,5 +23,9 @@ urlpatterns = [
     path('komentarze', views.komentarze, name='komentarze'),
     path('dodaj-komentarz', views.dodaj_komentarz, name='dodaj-komentarz'),
 
+    path('forum', views.forum, name='forum'),
+    path('dodaj-watek', views.dodaj_watek, name='dodaj-watek'),
+    path('watek', views.watek, name='watek'),
+
     path('profile', views.profile, name='profile'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

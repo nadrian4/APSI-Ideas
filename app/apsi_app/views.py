@@ -5,9 +5,9 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.db import transaction
 
-from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz, SlowoKluczowe, PomyslSlowoKluczowe
+from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz, SlowoKluczowe, PomyslSlowoKluczowe, Watek, ForumPost
 from .models import KATEGORIE, ROLE
-from .forms import PomyslForm
+from .forms import PomyslForm, WatekForm
 
 def index(request):
     if request.method == 'POST':
@@ -412,3 +412,60 @@ def dodaj_komentarz(request):
     
     return render(request, 'apsi_app/dodaj-komentarz.html', context)
 
+
+def forum(request):
+    paginator = Paginator(Watek.objects.all().order_by('-id'), 10)
+    page = request.GET.get('page')
+    watki = paginator.get_page(page)
+
+    context = {
+        'watki': watki,
+        'page': page
+    }
+
+    return render(request, 'apsi_app/forum/forum.html', context)
+
+
+def dodaj_watek(request):
+    if request.method == 'POST':
+        watek_form = WatekForm(request.POST)
+
+        if watek_form.is_valid():
+            with transaction.atomic():
+                watek = watek_form.save(commit=False)
+                watek.uzytkownik = request.user
+                watek.save()
+
+                wpis1 = ForumPost(tresc=watek_form.cleaned_data['tresc'], uzytkownik=request.user, watek=watek)
+                wpis1.save()
+
+            return redirect(reverse('watek')+f"?watek_id={watek.id}")
+        else:
+            print('form invalid')
+
+    watek_form = WatekForm()
+
+    context = {
+        'watek_form': watek_form,
+    }
+
+    return render(request, 'apsi_app/forum/dodaj-watek.html', context)
+
+
+def watek(request):
+    watek_id = request.GET['watek_id']
+    watek = Watek.objects.get(id=watek_id)
+
+    if request.method == 'POST':
+        tresc = request.POST['tresc']
+        wpis = ForumPost(tresc=tresc, uzytkownik=request.user, watek=watek)
+        wpis.save()
+
+    wpisy = ForumPost.objects.filter(watek=watek_id)
+
+    context = {
+        'watek': watek,
+        'wpisy': wpisy,
+    }
+
+    return render(request, 'apsi_app/forum/watek.html', context)
