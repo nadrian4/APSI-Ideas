@@ -1,0 +1,43 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+<div class="row mt-4">
+    <div class="col" style="max-width: 1200px;">
+
+        <h5 class="display-1">{{ watek.tytul }}</h5>
+
+        {% for wpis in wpisy %}
+        <div class="card mb-3" style="max-width: 1000px;">
+          <div class="row g-0">
+              <div class="card-body">
+                {{wpis.uzytkownik}}, {{wpis.data}}
+                <div style="position: absolute; top: 0; right: 0; width: 100px; text-align:right;margin-right: 20px;">
+                    #{{wpis.id}}
+                  </div>
+                  <div class="row g-0" style="padding-left: 5%; padding-top: 10px;">
+                      {{wpis.tresc}}
+                  </div>
+              </div>
+          </div>
+          <div class="row g-0">
+            <div class="col-md-8">
+                <!-- <a class="mt-3 mb-3 btn btn-primary" href="{% url 'dodaj-komentarz' %}?pomysl_id={{ pomysl_id }}&komentarz_id={{ komGleb.0.pk }}" role="button">Odpowiedz</a> -->
+            </div>           
+          </div>
+        </div>
+      {% endfor %}
+      <div class="col-md-8">
+        <form method="POST" style="max-width: 700px;">
+            {% csrf_token %}
+            <p>Dodaj wpis</p>
+            <div class="mb-3">
+                <textarea class="form-control" id="exampleFormControlTextarea1" name="tresc" rows="3"></textarea>
+            </div>
+        
+            <button type="submit" class="btn btn-primary mt-3">Odpowiedz</button>
+        </form>
+    </div>
+    </div>
+  </div>
+  
+  {% endblock content %}

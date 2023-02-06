@@ -1,0 +1,67 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+<div class="row mt-4">
+  <div class="col" style="max-width: 1000px;">
+    <a class="mb-3 btn btn-primary" href="{% url 'dodaj-watek' %}" role="button">Utwórz nowy wątek</a>
+    <h3>Wątki dostępne na forum</h3>
+    {% for watek in watki %}
+      <div class="card mb-3">
+        <div class="row g-0">
+          <div class="col-md-8">
+            <div class="card-body">
+              <div>
+                <a href="{% url 'watek' %}?watek_id={{ watek.id }}" class="link-primary">{{ watek.tytul }}</a>
+              </div>
+              
+              <p class="card-text"><small class="text-muted">Utworzony {{ watek.data|date:'d.m.Y' }} przez {{ watek.uzytkownik }}</small></p>
+
+            </div>
+          </div>
+
+          <div class="col-md-3">
+            <div class="card-body">
+              <div style="position: absolute; top: 0; right: 0; text-align:right;margin-top: 10px;margin-right: 20px;">
+                <small class="text-muted">
+                {{ watek.getPostCount }} wpisów <br>
+                ostatni wpis {{watek.getRecentPost.data}}
+              </small>
+              </div>
+              <p class="card-text"><small class="text-muted"></small></p>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    {% endfor %}
+
+  <div class="col" style="max-width: 200px;">
+    <nav class="sticky-top">
+
+      
+      <ul class="pagination">
+        {% if watki.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ watki.previous_page_number }}">Poprzedni</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link">Poprzedni</a></li>
+        {% endif %}
+
+        {% for i in watki.paginator.page_range %}
+            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+        {% endfor %}
+
+        {% if watki.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ watki.next_page_number }}">Następny</a></li>
+        {% else %}
+          <li class="page-item disabled"><a class="page-link">Następny</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+
+  </div>
+
+</div>
+
+{% endblock content %}

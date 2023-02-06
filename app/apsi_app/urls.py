@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('konkursy', views.konkursy, name='konkursy'),
     path('strona-konkursu', views.strona_konkursu, name='strona-konkursu'),
+    path('sklad-komisji', views.sklad_komisji, name='sklad-komisji'),
     path('utworz-konkurs', views.utworz_konkurs, name='utworz-konkurs'),
     path('usun-konkurs', views.usun_konkurs, name='usun-konkurs'),
 
@@ -23,6 +24,10 @@ urlpatterns = [
 
     path('komentarze', views.komentarze, name='komentarze'),
     path('dodaj-komentarz', views.dodaj_komentarz, name='dodaj-komentarz'),
+
+    path('forum', views.forum, name='forum'),
+    path('dodaj-watek', views.dodaj_watek, name='dodaj-watek'),
+    path('watek', views.watek, name='watek'),
 
     path('profile', views.profile, name='profile'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

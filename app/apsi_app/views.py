@@ -1,13 +1,16 @@
-from django.shortcuts import render, redirect
-from django.core.paginator import Paginator
-from django.utils import timezone
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.db import transaction
+from django.shortcuts import render, redirect
+from django.urls import reverse
 
-from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz, SlowoKluczowe, PomyslSlowoKluczowe
-from .models import KATEGORIE, ROLE
+from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz, SlowoKluczowe, PomyslSlowoKluczowe, Watek, ForumPost
 from .forms import PomyslForm
+from .models import KATEGORIE, ROLE
+from .forms import PomyslForm, WatekForm
+from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz, SlowoKluczowe, \
+    PomyslSlowoKluczowe, CzlonekKomisji
+
 
 def index(request):
     if request.method == 'POST':
@@ -111,13 +114,41 @@ def strona_konkursu(request):
     return render(request, 'apsi_app/konkursy/strona-konkursu.html', context)
 
 
+def sklad_komisji(request):
+    konkurs = Konkurs.objects.get(pk=request.GET['konkurs_id'])
+    sklad_komisji = CzlonekKomisji.objects.filter(konkurs=konkurs)
+    if request.method == 'POST':
+        if 'dodaj_czlonka' in request.POST and 'wyborNowegoCzlonka' in request.POST:
+            username = request.POST['wyborNowegoCzlonka']
+            user = User.objects.filter(username=username)
+            if len(user) == 1 and user[0].id not in [u.uzytkownik.id for u in sklad_komisji]:
+                nowy_czlonek = CzlonekKomisji(uzytkownik_id=user[0].id, konkurs_id=konkurs.id)
+                nowy_czlonek.save()
+                sklad_komisji = CzlonekKomisji.objects.filter(konkurs=konkurs)
+        elif 'usunCzlonka' in request.POST:
+            id_czlonka = request.POST['usunCzlonka']
+            czlonek_komisji = CzlonekKomisji.objects.get(pk=id_czlonka)
+            czlonek_komisji.delete()
+            sklad_komisji = CzlonekKomisji.objects.filter(konkurs=konkurs)
+    reszta = User.objects.exclude(pk__in=[i.uzytkownik_id for i in sklad_komisji])
+
+    context = {
+        'konkurs': konkurs,
+        'sklad_komisji': [c for c in sklad_komisji],
+        'reszta': reszta
+    }
+    if request.user.groups.filter(name='Organizator'):
+        return render(request, 'apsi_app/konkursy/sklad-komisji.html', context)
+    else:
+        return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Organizator'})
+
+
 def utworz_konkurs(request):
     if request.method == 'POST':
         nazwa = request.POST['nazwa']
         data_koniec = request.POST['data_koniec']
         konkurs = Konkurs(nazwa=nazwa, data_koniec=data_koniec)
         konkurs.save()
-
         return redirect('konkursy')
     else:
         return render(request, 'apsi_app/konkursy/utworz-konkurs.html')
@@ -276,7 +307,6 @@ def utworz_glosowanie(request):
             return render(request, 'apsi_app/glosowania/utworz-glosowanie.html', context)
         elif 'utworz_glosowanie' in request.POST:
             nazwa = request.POST['nazwa']
-            max_glos = request.POST['max_glos']
             data_koniec = request.POST['data_koniec']
             wybrane_pomysly_id = request.POST.getlist('pomysly')
             wybrane_pomysly = []
@@ -284,10 +314,12 @@ def utworz_glosowanie(request):
             for id in wybrane_pomysly_id:
                 wybrane_pomysly.append(Pomysl.objects.get(pk=id))
 
+            max_glos = len(wybrane_pomysly)
             glosowanie = Glosowanie(nazwa=nazwa, max_glos=max_glos, data_koniec=data_koniec)
 
             with transaction.atomic():
-                glosowanie.save()
+                if max_glos != 0:
+                    glosowanie.save()
 
                 for pomysl in wybrane_pomysly:
                     glosowanie_pomysl = GlosowaniePomysl(glosowanie=glosowanie, pomysl=pomysl, srednia_glosow=0)
@@ -304,26 +336,32 @@ def utworz_glosowanie(request):
 
 def strona_glosowania(request):
     if request.method == 'POST':
-        glosowanie = Glosowanie.objects.get(pk=request.POST['glosowanie_id'])
-        pomysl = Pomysl.objects.get(pk=request.POST['pomysl_id'])
-        uzytkownik = request.user
-
-        if not Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik):
-            glos = Glos(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik, glos=request.POST['glos'])
-            glos.save()
-
+        if 'wyczysc_glosy' in request.POST:
+            glosowanie = Glosowanie.objects.get(pk=request.GET['glosowanie_id'])
+            uzytkownik = request.user
+            glosy_pomysl = Glos.objects.filter(glosowanie=glosowanie, uzytkownik=uzytkownik)
+            glosy_pomysl.delete()
         else:
-            glos = Glos.objects.get(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik)
-            glos.glos = request.POST['glos']
-            glos.save()
-    
-        glosy_pomysl = Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl)
-        glosy_pomysl = [g.glos for g in glosy_pomysl]
-        glosy_pomysl_mean = sum(glosy_pomysl) / len(glosy_pomysl)
+            glosowanie = Glosowanie.objects.get(pk=request.POST['glosowanie_id'])
+            pomysl = Pomysl.objects.get(pk=request.POST['pomysl_id'])
+            uzytkownik = request.user
 
-        glosowanie_pomysl = GlosowaniePomysl.objects.get(glosowanie=glosowanie, pomysl=pomysl)
-        glosowanie_pomysl.srednia_glosow = glosy_pomysl_mean
-        glosowanie_pomysl.save()
+            if not Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik):
+                glos = Glos(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik, glos=request.POST['glos'])
+                glos.save()
+
+            else:
+                glos = Glos.objects.get(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik)
+                glos.glos = request.POST['glos']
+                glos.save()
+
+            glosy_pomysl = Glos.objects.filter(glosowanie=glosowanie, pomysl=pomysl, uzytkownik=uzytkownik)
+            glosy_pomysl = [g.glos for g in glosy_pomysl]
+            glosy_pomysl_mean = sum(glosy_pomysl) / len(glosy_pomysl)
+
+            glosowanie_pomysl = GlosowaniePomysl.objects.get(glosowanie=glosowanie, pomysl=pomysl)
+            glosowanie_pomysl.srednia_glosow = glosy_pomysl_mean
+            glosowanie_pomysl.save()
 
     glosowanie_id = request.GET['glosowanie_id']
     glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
@@ -333,19 +371,38 @@ def strona_glosowania(request):
     for glosowanie_pomysl in glosowanie_pomysl_list:
         pomysly_srednia_glos.append({'pomysl': glosowanie_pomysl.pomysl, 'glos': glosowanie_pomysl.srednia_glosow})
 
-    glos_list = list(range(1, glosowanie.max_glos + 1))
+    glosowanie = Glosowanie.objects.get(pk=request.GET['glosowanie_id'])
+    uzytkownik = request.user
+    glosy = Glos.objects.filter(glosowanie=glosowanie, uzytkownik=uzytkownik)
+    glosy = [g.glos for g in glosy]
+    glos_list = []
+    for i in range(1, glosowanie.max_glos + 1):
+        if i not in glosy:
+            glos_list.append(i)
 
+    glosy = Glos.objects.filter(glosowanie=glosowanie, uzytkownik=uzytkownik)
     context = {
         'glosowanie': glosowanie,
         'glosowanie_id': glosowanie_id,
         'pomysly_srednia_glos': pomysly_srednia_glos,
-        'glos_list': glos_list
+        'glos_list': glos_list,
+        'glosy': glosy
     }
 
     return render(request, 'apsi_app/glosowania/strona-glosowania.html', context)
 
 
 def usun_glosowanie(request):
+    if request.method == 'POST':
+        glosowanie_id = request.GET['glosowanie_id']
+        glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
+        glosowanie.delete()
+
+        return redirect('glosowania')
+
+    return render(request, 'apsi_app/glosowania/usun-glosowanie.html')
+
+def wyczysc_glosy(request):
     if request.method == 'POST':
         glosowanie_id = request.GET['glosowanie_id']
         glosowanie = Glosowanie.objects.get(pk=glosowanie_id)
@@ -407,3 +464,60 @@ def dodaj_komentarz(request):
     
     return render(request, 'apsi_app/dodaj-komentarz.html', context)
 
+
+def forum(request):
+    paginator = Paginator(Watek.objects.all().order_by('-id'), 10)
+    page = request.GET.get('page')
+    watki = paginator.get_page(page)
+
+    context = {
+        'watki': watki,
+        'page': page
+    }
+
+    return render(request, 'apsi_app/forum/forum.html', context)
+
+
+def dodaj_watek(request):
+    if request.method == 'POST':
+        watek_form = WatekForm(request.POST)
+
+        if watek_form.is_valid():
+            with transaction.atomic():
+                watek = watek_form.save(commit=False)
+                watek.uzytkownik = request.user
+                watek.save()
+
+                wpis1 = ForumPost(tresc=watek_form.cleaned_data['tresc'], uzytkownik=request.user, watek=watek)
+                wpis1.save()
+
+            return redirect(reverse('watek')+f"?watek_id={watek.id}")
+        else:
+            print('form invalid')
+
+    watek_form = WatekForm()
+
+    context = {
+        'watek_form': watek_form,
+    }
+
+    return render(request, 'apsi_app/forum/dodaj-watek.html', context)
+
+
+def watek(request):
+    watek_id = request.GET['watek_id']
+    watek = Watek.objects.get(id=watek_id)
+
+    if request.method == 'POST':
+        tresc = request.POST['tresc']
+        wpis = ForumPost(tresc=tresc, uzytkownik=request.user, watek=watek)
+        wpis.save()
+
+    wpisy = ForumPost.objects.filter(watek=watek_id)
+
+    context = {
+        'watek': watek,
+        'wpisy': wpisy,
+    }
+
+    return render(request, 'apsi_app/forum/watek.html', context)
