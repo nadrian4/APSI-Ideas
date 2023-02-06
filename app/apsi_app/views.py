@@ -223,6 +223,27 @@ def edytuj_pomysl(request):
     return render(request, 'apsi_app/edytuj-pomysl.html', context)
 
 
+def edytuj_stan_pomyslu(request):
+    pomysl_id = request.POST['pomysl_id']
+    pomysl = Pomysl.objects.get(pk=pomysl_id)
+
+    if request.method == 'POST':
+        pomysl.stan = request.POST['stan']
+        pomysl.wiadomosc = request.POST['wiadomosc']
+        pomysl.save()
+        return redirect('profile')
+
+    context = {
+        'pomysl': pomysl,
+        'kategorie': [k[1] for k in KATEGORIE],
+        'role': [r[1] for r in ROLE],
+    }
+
+    #return redirect('edytuj-pomysl', pomysl_id=pomysl.pk)
+
+    #return render(request, 'apsi_app/edytuj-stan-pomyslu.html', context)
+
+
 def glosowania(request):
     paginator = Paginator(Glosowanie.objects.all().order_by('data_koniec'), 5)
     page = request.GET.get('page')

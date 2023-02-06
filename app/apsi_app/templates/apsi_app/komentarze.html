@@ -1,13 +1,12 @@
 {% extends "apsi_app/base.html" %}
 {% block content %}
-
 <div class="row mt-4">
     <div class="col" style="max-width: 700px;">
         <!-- <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon1">Tytuł</span>
             <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1" value="{{ pomysl.tytul }}" readonly>
-        </div>      
-    
+        </div>
+
         <div class="input-group mb-3">
             <span class="input-group-text">Treść</span>
             <textarea class="form-control" aria-label="With textarea" readonly>{{ pomysl.tresc }}</textarea>
@@ -22,7 +21,6 @@
             <input type="text" class="form-control" name="{{ pomysl_form.planowane_koszty.name }}" readonly>{{ pomysl.planowane_koszty }}</input>
             <span class="input-group-text">zł</span>
         </div> -->
-
         <h1 class="display-1">{{ pomysl.tytul }}</h1>
         <h1 class="display-6">Treść</h1>
         <p>{{ pomysl.tresc }}</p>
@@ -40,7 +38,7 @@
                 {% endfor %}
             </select>
         </div> -->
-    
+
         <!-- <div class="input-group mb-3">
             <label class="input-group-text" for="inputGroupSelect01">Kto może oceniać</label>
             <select class="form-select" id="inputGroupSelect01" disabled>
@@ -71,11 +69,55 @@
           <div class="row g-0">
             <div class="col-md-8">
                 <a class="mt-3 mb-3 btn btn-primary" href="{% url 'dodaj-komentarz' %}?pomysl_id={{ pomysl_id }}&komentarz_id={{ komGleb.0.pk }}" role="button">Odpowiedz</a>
-            </div>           
+            </div>
           </div>
         </div>
       {% endfor %}
     </div>
+
+<h5 style="margin-top: 30px">Komisja: zarządzanie pomysłem</h5>
+<hr>
+<form method="POST" enctype="multipart/form-data" action="{% url 'edytuj-stan-pomyslu' %}">
+{% csrf_token %}
+    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+      <input type="radio" class="btn-check" name="stan" value="Zaakceptowany" id="btnradio1" autocomplete="off"
+         {% if pomysl.stan == "Zaakceptowany" %}
+            checked
+         {% endif %}
+      >
+      <label class="btn btn-outline-primary" for="btnradio1">Akceptuj pomysł</label>
+
+      <input type="radio" class="btn-check" name="stan" value="Odrzucony" id="btnradio2" autocomplete="off"
+          {% if pomysl.stan == "Odrzucony" %}
+            checked
+         {% endif %}
+      >
+      <label class="btn btn-outline-primary" for="btnradio2">Odrzuć pomysł</label>
+
+      <input type="radio" class="btn-check" name="stan" value="Doprecyzuj" id="btnradio3" autocomplete="off"
+         {% if pomysl.stan == "Doprecyzuj" %}
+            checked
+         {% endif %}
+      >
+      <label class="btn btn-outline-primary" for="btnradio3">Wyślij prośbę o doprecyzowanie</label>
+
+      <input type="radio" class="btn-check" name="stan" value="Odłożony" id="btnradio4" autocomplete="off"
+         {% if pomysl.stan == "Odłożony" %}
+            checked
+         {% endif %}
+      >
+      <label class="btn btn-outline-primary" for="btnradio4">Odłóż pomysł</label>
+    </div>
+
+    <div class="input-group mb-3 mt-4">
+        <span class="input-group-text form-control" name="wiadomosc">Wiadomość</span>
+        <textarea class="form-control" aria-label="With textarea" name="wiadomosc">{{ pomysl.wiadomosc }}</textarea>
+        <input class="form-control" type="hidden" name="pomysl_id" value="{{ pomysl.id }}">
+
+    </div>
+    <button type="submit" name="edytuj_stan_pomyslu" class="btn btn-lg btn-primary">Wyślij</button>
+    </form>
+
   </div>
-  
+
   {% endblock content %}

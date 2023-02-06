@@ -14,6 +14,7 @@ urlpatterns = [
     path('dodaj-pomysl', views.dodaj_pomysl, name='dodaj-pomysl'),
     path('usun-pomysl', views.usun_pomysl, name='usun-pomysl'),
     path('edytuj-pomysl', views.edytuj_pomysl, name='edytuj-pomysl'),
+    path('edytuj-stan-pomyslu', views.edytuj_stan_pomyslu, name='edytuj-stan-pomyslu'),
 
     path('glosowania', views.glosowania, name='glosowania'),
     path('utworz-glosowanie', views.utworz_glosowanie, name='utworz-glosowanie'),
