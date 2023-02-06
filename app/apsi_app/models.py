@@ -43,6 +43,8 @@ class Pomysl(models.Model):
     srednia_ocen = models.IntegerField(default=0)
     uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
     konkurs = models.ForeignKey(Konkurs, null=True, on_delete=models.SET_NULL)
+    stan = models.CharField(default='zaakceptowany', max_length=100)
+    wiadomosc = models.CharField(default='', max_length=200)
 
     def __str__(self):
         return self.tytul
