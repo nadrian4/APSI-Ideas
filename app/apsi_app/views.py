@@ -1,13 +1,16 @@
-from django.shortcuts import render, redirect
-from django.core.paginator import Paginator
-from django.utils import timezone
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.db import transaction
+from django.shortcuts import render, redirect
+from django.urls import reverse
 
 from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz, SlowoKluczowe, PomyslSlowoKluczowe, Watek, ForumPost
+from .forms import PomyslForm
 from .models import KATEGORIE, ROLE
 from .forms import PomyslForm, WatekForm
+from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz, SlowoKluczowe, \
+    PomyslSlowoKluczowe, CzlonekKomisji
+
 
 def index(request):
     if request.method == 'POST':
@@ -111,13 +114,41 @@ def strona_konkursu(request):
     return render(request, 'apsi_app/konkursy/strona-konkursu.html', context)
 
 
+def sklad_komisji(request):
+    konkurs = Konkurs.objects.get(pk=request.GET['konkurs_id'])
+    sklad_komisji = CzlonekKomisji.objects.filter(konkurs=konkurs)
+    if request.method == 'POST':
+        if 'dodaj_czlonka' in request.POST and 'wyborNowegoCzlonka' in request.POST:
+            username = request.POST['wyborNowegoCzlonka']
+            user = User.objects.filter(username=username)
+            if len(user) == 1 and user[0].id not in [u.uzytkownik.id for u in sklad_komisji]:
+                nowy_czlonek = CzlonekKomisji(uzytkownik_id=user[0].id, konkurs_id=konkurs.id)
+                nowy_czlonek.save()
+                sklad_komisji = CzlonekKomisji.objects.filter(konkurs=konkurs)
+        elif 'usunCzlonka' in request.POST:
+            id_czlonka = request.POST['usunCzlonka']
+            czlonek_komisji = CzlonekKomisji.objects.get(pk=id_czlonka)
+            czlonek_komisji.delete()
+            sklad_komisji = CzlonekKomisji.objects.filter(konkurs=konkurs)
+    reszta = User.objects.exclude(pk__in=[i.uzytkownik_id for i in sklad_komisji])
+
+    context = {
+        'konkurs': konkurs,
+        'sklad_komisji': [c for c in sklad_komisji],
+        'reszta': reszta
+    }
+    if request.user.groups.filter(name='Organizator'):
+        return render(request, 'apsi_app/konkursy/sklad-komisji.html', context)
+    else:
+        return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Organizator'})
+
+
 def utworz_konkurs(request):
     if request.method == 'POST':
         nazwa = request.POST['nazwa']
         data_koniec = request.POST['data_koniec']
         konkurs = Konkurs(nazwa=nazwa, data_koniec=data_koniec)
         konkurs.save()
-
         return redirect('konkursy')
     else:
         return render(request, 'apsi_app/konkursy/utworz-konkurs.html')
