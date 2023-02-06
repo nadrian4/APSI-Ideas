@@ -1,6 +1,6 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
 
 KATEGORIE = (
     ('Edukacja', 'Edukacja'),
@@ -43,7 +43,7 @@ class Pomysl(models.Model):
     srednia_ocen = models.IntegerField(default=0)
     uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
     konkurs = models.ForeignKey(Konkurs, null=True, on_delete=models.SET_NULL)
-    
+
     def __str__(self):
         return self.tytul
 
@@ -74,6 +74,7 @@ class Glos(models.Model):
     def __str__(self):
         return self.glosowanie.__str__() + ', ' + self.pomysl.__str__() + ', ' + self.glos.__str__()
 
+
 class Komentarz(models.Model):
     tresc = models.CharField(max_length=200)
     data = models.DateTimeField(default=timezone.now)
@@ -85,13 +86,14 @@ class Komentarz(models.Model):
         r = []
         r.append([self, depth])
         for c in Komentarz.objects.filter(rodzic=self):
-            _r = c.get_children_with_depths(depth=depth+1)
+            _r = c.get_children_with_depths(depth=depth + 1)
             if 0 < len(_r):
                 r.extend(_r)
         return r
 
     def __str__(self):
         return self.tresc
+
 
 class Ocena(models.Model):
     ocena = models.IntegerField()
@@ -117,3 +119,9 @@ class ForumPost(models.Model):
     data = models.DateTimeField(default=timezone.now)
     uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
     watek = models.ForeignKey(Watek, on_delete=models.CASCADE)
+
+
+class CzlonekKomisji(models.Model):
+    konkurs = models.ForeignKey(Konkurs, on_delete=models.CASCADE)
+    uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
+

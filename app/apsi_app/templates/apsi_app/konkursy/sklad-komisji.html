@@ -1,0 +1,42 @@
+{% extends "apsi_app/base.html" %}
+{% block content %}
+
+<h1 class="display-6 mt-3">{{ konkurs.nazwa }}</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1 class="display-6 mt-3">Skład komisji</h1>
+            {% for czlonek_komisji in sklad_komisji %}
+
+            <br/>
+            <div class="row g-0 bg-light position-relative mb-3">
+                <div class="col-md-6 p-4 ps-md-0">
+                    <h4 class="mt-0">{{ czlonek_komisji.uzytkownik.username }}</h4>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit" name="usunCzlonka" value="{{czlonek_komisji.id}}" class="btn btn-primary mt-3">Usuń członka</button>
+                    </form>
+                </div>
+            </div>
+
+            {% endfor %}
+
+
+            <form method="POST">
+                {% csrf_token %}
+                <select name="wyborNowegoCzlonka">
+                    {% for uzytkownik in reszta %}
+                    <option name='nazwa_uzytkownika' value="{{ uzytkownik.username }}">{{ uzytkownik.username }}</option>
+                    {% endfor %}
+                </select>
+                <button name="dodaj_czlonka"
+                        type="submit"
+                        value=""
+                        class="btn btn-primary mt-3">Dodaj członka</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
