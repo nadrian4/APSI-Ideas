@@ -11,7 +11,8 @@
     <body>
       <nav class="navbar navbar-expand-lg sticky-top mb-3" style="background-color: #e3f2fd;">
         <div class="container-fluid">
-          <a class="navbar-brand" href="{% url 'index' %}">Innowacje</a>
+          <img src="app/apsi_app/templates/apsi_app/img/logo-nav.png" width="50px" height="50px" style="margin-right: 20px">
+          <a class="navbar-brand" href="{% url 'index' %}" class="mr-5" style="letter-spacing: 6px; color: #1e90ff; font-weight: bold">INNOWACJE</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -29,6 +30,8 @@
               <li class="nav-item">
                 <a class="nav-link active" href="{% url 'forum' %}">Forum Ogólne</a>
               </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'login' %}">Zaloguj się</a>
               </li>
