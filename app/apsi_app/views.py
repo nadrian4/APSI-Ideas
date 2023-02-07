@@ -73,10 +73,10 @@ def konkursy(request):
         'page': page
     }
 
-    if request.user.groups.filter(name='Członek komisji'):
+    if request.user.groups.filter(name='Członek komisji') or request.user.groups.filter(name='Organizator'):
         return render(request, 'apsi_app/konkursy/konkursy.html', context)
     else:
-        return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Członek komisji'})
+        return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Członek komisji, Organizator'})
 
 
 def strona_konkursu(request):
@@ -209,6 +209,7 @@ def dodaj_pomysl(request):
             return redirect('index')
         else:
             print('form invalid')
+            print(pomysl_form.errors)
 
     pomysl_form = PomyslForm()
 

@@ -34,7 +34,7 @@ class Glosowanie(models.Model):
 
 
 class Pomysl(models.Model):
-    tytul = models.CharField(max_length=20)
+    tytul = models.CharField(max_length=40)
     tresc = models.CharField(max_length=200)
     planowane_korzysci = models.CharField(max_length=200)
     planowane_koszty = models.FloatField()
