@@ -8,6 +8,12 @@
         <div class="card-body">
             <h5 class="card-title">{{ user }}</h5>
         </div>
+
+        <form method="POST">
+          {% csrf_token %}
+          <button type="submit" name="wyloguj_sie" class="btn btn-warning">Wyloguj się</button>
+        </form>
+
         <ul class="list-group list-group-flush">
             {% for group in user_groups %}
             <li class="list-group-item">{{ group }}</li>
