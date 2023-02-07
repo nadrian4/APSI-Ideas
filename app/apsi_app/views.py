@@ -69,14 +69,17 @@ def konkursy(request):
     konkursy = paginator.get_page(page)
 
     context = {
+        'organizator': request.user.groups.filter(name='Organizator'),
         'konkursy': konkursy,
         'page': page
     }
 
-    if request.user.groups.filter(name='Członek komisji'):
-        return render(request, 'apsi_app/konkursy/konkursy.html', context)
-    else:
-        return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Członek komisji'})
+    return render(request, 'apsi_app/konkursy/konkursy.html', context)
+
+    # if request.user.groups.filter(name='Członek komisji') or request.user.groups.filter(name='Organizator'):
+    #     return render(request, 'apsi_app/konkursy/konkursy.html', context)
+    # else:
+    #     return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Członek komisji, Organizator'})
 
 
 def strona_konkursu(request):
@@ -190,6 +193,7 @@ def profile(request):
 
 
 def dodaj_pomysl(request):
+    errors = ''
     if request.method == 'POST':
         pomysl_form = PomyslForm(request.POST, request.FILES)
         print(request.POST['slowakluczowe'].split(', '))
@@ -209,11 +213,14 @@ def dodaj_pomysl(request):
             return redirect('index')
         else:
             print('form invalid')
+            print(pomysl_form.errors)
+            errors = pomysl_form.errors
 
     pomysl_form = PomyslForm()
 
     context = {
         'pomysl_form': pomysl_form,
+        'errors': errors,
         'kategorie': [k[1] for k in KATEGORIE],
         'role': [r[1] for r in ROLE],
     }
@@ -285,7 +292,8 @@ def glosowania(request):
         'page': page
     }
 
-    if request.user.groups.filter(name='Członek komisji'):
+    jest_czlonkiem_komisji = len(CzlonekKomisji.objects.all().filter(uzytkownik_id=request.user.id)) > 0
+    if request.user.groups.filter(name='Członek komisji') or jest_czlonkiem_komisji:
         return render(request, 'apsi_app/glosowania/glosowania.html', context)
     else:
         return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Członek komisji'})

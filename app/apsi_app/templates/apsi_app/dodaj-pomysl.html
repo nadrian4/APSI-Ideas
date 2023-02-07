@@ -3,7 +3,7 @@
 
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-
+    <div style="color: red;"> {{ errors }} </div>
     <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1">Tytuł</span>
         <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1" name="{{ pomysl_form.tytul.name }}">

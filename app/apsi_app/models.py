@@ -34,7 +34,7 @@ class Glosowanie(models.Model):
 
 
 class Pomysl(models.Model):
-    tytul = models.CharField(max_length=20)
+    tytul = models.CharField(max_length=40)
     tresc = models.CharField(max_length=200)
     planowane_korzysci = models.CharField(max_length=200)
     planowane_koszty = models.FloatField()
@@ -45,7 +45,7 @@ class Pomysl(models.Model):
     srednia_ocen = models.IntegerField(default=0)
     uzytkownik = models.ForeignKey(User, on_delete=models.CASCADE)
     konkurs = models.ForeignKey(Konkurs, null=True, on_delete=models.SET_NULL)
-    stan = models.CharField(default='zaakceptowany', max_length=100)
+    stan = models.CharField(default='-', max_length=100)
     wiadomosc = models.CharField(default='', max_length=200)
 
     def __str__(self):

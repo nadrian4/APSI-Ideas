@@ -25,11 +25,6 @@
         <span class="input-group-text">zł</span>
     </div>
 
-    <div class="mb-3">
-        <label for="slowakluczowe" class="form-label">Dodaj słowa kluczowe</label>
-        <input type="text" class="form-control" id="slowakluczowe" name="slowakluczowe">
-    </div>
-
     <div class="input-group mb-3">
         <label class="input-group-text" for="inputGroupSelect01">Kategoria</label>
         <select class="form-select" id="inputGroupSelect01" name="kategoria">
@@ -49,17 +44,7 @@
             {% endfor %}
         </select>
     </div>
-
-    <div class="mb-3">
-        <label for="formFile" class="form-label">Wybierz obraz dla pomysłu</label>
-        <input class="form-control" type="file" id="formFile" name="{{ pomysl_form.plik.name }}">
-    </div>
-
-    <div class="mb-3">
-        <label for="formFileMultiple" class="form-label">Wybierz pliki dla pomysłu</label>
-        <input class="form-control" type="file" id="formFileMultiple" name="wiele_plikow" multiple>
-    </div>
-
+    
     <button type="submit" name="edytuj_pomysl" class="btn btn-primary">Zapisz</button>
 </form>
 

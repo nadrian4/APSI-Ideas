@@ -18,6 +18,8 @@ def login_apsi(request):
                 return redirect('index')
             else:
                 return redirect('login')
+        else:
+            print(login_form.errors)
     else:
         login_form = LoginForm()
 

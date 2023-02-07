@@ -17,7 +17,9 @@
   </div>
   <div class="row mt-5">
     <nav class="sticky-top">
+      {% if organizator %}
       <a class="mb-3 btn btn-primary" href="{% url 'utworz-konkurs' %}" role="button">Utwórz konkurs</a>
+      {% endif %}
 
       <ul class="pagination">
         {% if konkursy.has_previous %}
