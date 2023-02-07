@@ -14,7 +14,7 @@
                 <a href="{% url 'watek' %}?watek_id={{ watek.id }}" class="link-primary">{{ watek.tytul }}</a>
               </div>
               
-              <p class="card-text"><small class="text-muted">Utworzony {{ watek.data|date:'d.m.Y' }} przez {{ watek.uzytkownik }}</small></p>
+              <p class="card-text"><small class="text-muted">Utworzony {{ watek.data|date:'d.m.Y H:i' }} przez {{ watek.uzytkownik }}</small></p>
 
             </div>
           </div>
@@ -24,7 +24,7 @@
               <div style="position: absolute; top: 0; right: 0; text-align:right;margin-top: 10px;margin-right: 20px;">
                 <small class="text-muted">
                 {{ watek.getPostCount }} wpisów <br>
-                ostatni wpis {{watek.getRecentPost.data}}
+                ostatni wpis {{watek.getRecentPost.data|date:'d.m.Y H:i'}}
               </small>
               </div>
               <p class="card-text"><small class="text-muted"></small></p>

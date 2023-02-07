@@ -69,14 +69,17 @@ def konkursy(request):
     konkursy = paginator.get_page(page)
 
     context = {
+        'organizator': request.user.groups.filter(name='Organizator'),
         'konkursy': konkursy,
         'page': page
     }
 
-    if request.user.groups.filter(name='Członek komisji') or request.user.groups.filter(name='Organizator'):
-        return render(request, 'apsi_app/konkursy/konkursy.html', context)
-    else:
-        return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Członek komisji, Organizator'})
+    return render(request, 'apsi_app/konkursy/konkursy.html', context)
+
+    # if request.user.groups.filter(name='Członek komisji') or request.user.groups.filter(name='Organizator'):
+    #     return render(request, 'apsi_app/konkursy/konkursy.html', context)
+    # else:
+    #     return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Członek komisji, Organizator'})
 
 
 def strona_konkursu(request):
