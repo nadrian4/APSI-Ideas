@@ -190,6 +190,7 @@ def profile(request):
 
 
 def dodaj_pomysl(request):
+    errors = ''
     if request.method == 'POST':
         pomysl_form = PomyslForm(request.POST, request.FILES)
         print(request.POST['slowakluczowe'].split(', '))
@@ -210,11 +211,13 @@ def dodaj_pomysl(request):
         else:
             print('form invalid')
             print(pomysl_form.errors)
+            errors = pomysl_form.errors
 
     pomysl_form = PomyslForm()
 
     context = {
         'pomysl_form': pomysl_form,
+        'errors': errors,
         'kategorie': [k[1] for k in KATEGORIE],
         'role': [r[1] for r in ROLE],
     }
