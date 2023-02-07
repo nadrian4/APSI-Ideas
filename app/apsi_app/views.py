@@ -289,7 +289,8 @@ def glosowania(request):
         'page': page
     }
 
-    if request.user.groups.filter(name='Członek komisji'):
+    jest_czlonkiem_komisji = len(CzlonekKomisji.objects.all().filter(uzytkownik_id=request.user.id)) > 0
+    if request.user.groups.filter(name='Członek komisji') or jest_czlonkiem_komisji:
         return render(request, 'apsi_app/glosowania/glosowania.html', context)
     else:
         return render(request, 'apsi_app/odmowa-dostepu.html', {'uprawnione_grupy': 'Członek komisji'})
