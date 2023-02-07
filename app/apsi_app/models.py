@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
+from PIL import Image
+
 KATEGORIE = (
     ('Edukacja', 'Edukacja'),
     ('Życie społeczne', 'Życie społeczne'),
@@ -48,6 +50,12 @@ class Pomysl(models.Model):
 
     def __str__(self):
         return self.tytul
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        image = Image.open(self.plik.path)
+        image = image.crop((0, 0, 4000, 5000))
+        image.save(self.plik.path)
 
 
 class SlowoKluczowe(models.Model):

@@ -1,68 +1,28 @@
 {% extends "apsi_app/base.html" %}
 {% block content %}
 <div class="row mt-4">
-    <div class="col" style="max-width: 1000px;">
-        <!-- <div class="input-group mb-3">
-            <span class="input-group-text" id="basic-addon1">Tytuł</span>
-            <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1" value="{{ pomysl.tytul }}" readonly>
+    <div class="col" style="max-width: 300px;">
+        <div class="card mb-3">
+          <img src="{{ pomysl.plik }}" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">{{ pomysl.tytul }}</h5>
+            <p class="card-text">{{ pomysl.tresc }}</p>
+            <p class="card-text">{{ pomysl.planowane_korzysci }}</p>
+            <p class="card-text">{{ pomysl.planowane_koszty }}</p>
+            <p class="card-text"><small class="text-muted">{{ pomysl.data|date:'d.m.Y' }}</small></p>
+          </div>
         </div>
-
-        <div class="input-group mb-3">
-            <span class="input-group-text">Treść</span>
-            <textarea class="form-control" aria-label="With textarea" readonly>{{ pomysl.tresc }}</textarea>
-        </div>
-
-        <div class="mb-3">
-            <label for="planowanekorzysci" class="form-label">{{ pomysl.planowane_korzysci }}</label>
-            <input type="text" class="form-control" id="planowanekorzysci" name="planowane_korzysci" readonly>{{ pomysl.planowane_korzysci }}</input>
-        </div>
-
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" name="{{ pomysl_form.planowane_koszty.name }}" readonly>{{ pomysl.planowane_koszty }}</input>
-            <span class="input-group-text">zł</span>
-        </div> -->
-        <h1 class="display-1">{{ pomysl.tytul }}</h1>
-        <h1 class="display-6">Treść</h1>
-        <p>{{ pomysl.tresc }}</p>
-        <h1 class="display-6">Planowane korzyści</h1>
-        <p>{{ pomysl.planowane_korzysci }}</p>
-        <h1 class="display-6">Planowane koszty</h1>
-        <p>{{ pomysl.planowane_koszty }} zł</p>
-
-        <!-- <div class="input-group mb-3">
-            <label class="input-group-text" for="inputGroupSelect01">Kategoria</label>
-            <select class="form-select" id="inputGroupSelect01" disabled>
-                <option selected>{{ pomysl.kategoria }}</option>
-                {% for i in kategorie %}
-                <option value="{{ i }}">{{ i }}</option>
-                {% endfor %}
-            </select>
-        </div> -->
-
-        <!-- <div class="input-group mb-3">
-            <label class="input-group-text" for="inputGroupSelect01">Kto może oceniać</label>
-            <select class="form-select" id="inputGroupSelect01" disabled>
-                <option selected>{{ pomysl.kto_moze_oceniac }}</option>
-                {% for i in role %}
-                <option value="{{ i }}">{{ i }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-4">
-            <img src="{{ pomysl.plik }}" class="img-fluid rounded-start" alt="...">
-        </div> -->
-        <!-- <p class="card-text"><small class="text-muted">{{ pomysl.data|date:'d.m.Y' }}</small></p> -->
 
         <div class="col-md-8">
             <a class="mt-3 mb-3 btn btn-primary" href="{% url 'dodaj-komentarz' %}?pomysl_id={{ pomysl.id }}" role="button">Skomentuj</a>
         </div>
       {% for komGleb in komentarzeGlebokosc %}
-        <div class="card mb-3" style="max-width: 800px;min-width: 200px;margin-left: {% widthratio 100 1 komGleb.1 %}px;">
+        <div class="card mb-3" style="max-width: 800px;min-width: 300px;margin-left: {% widthratio 100 1 komGleb.1 %}px;">
           <div class="row g-0">
               <div class="card-body">
-                {{komGleb.0.uzytkownik}}, {{komGleb.0.data}}
+                {{komGleb.0.uzytkownik}}, {{ komGleb.0.data|date:'d.m.Y H:i' }}
                   <div class="row g-0" style="padding-left: 5%; padding-top: 10px;">
-                      {{komGleb.0.tresc}}
+                    {{komGleb.0.tresc}}
                   </div>
               </div>
           </div>

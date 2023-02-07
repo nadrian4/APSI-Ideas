@@ -3,6 +3,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib.auth import logout
 
 from .models import Konkurs, Glosowanie, Pomysl, GlosowaniePomysl, Glos, Ocena, Komentarz, SlowoKluczowe, PomyslSlowoKluczowe, Watek, ForumPost
 from .forms import PomyslForm
@@ -35,15 +36,15 @@ def index(request):
     page = request.GET.get('page')
     pomysly = paginator.get_page(page)
     pomysly_kto_moze_oceniac = []
-    pomysly_slowa_kluczowe = []
 
     user_groups = request.user.groups.all()
 
     for pomysl in pomysly:
         moze_oceniac = False
 
-        if user_groups[0].__str__() == pomysl.kto_moze_oceniac or pomysl.kto_moze_oceniac == 'Wszyscy':
-            moze_oceniac = True
+        if user_groups:
+            if user_groups[0].__str__() == pomysl.kto_moze_oceniac or pomysl.kto_moze_oceniac == 'Wszyscy':
+                moze_oceniac = True
 
         pomysl_slowa_kluczowe = PomyslSlowoKluczowe.objects.filter(pomysl=pomysl)
         pomysly_kto_moze_oceniac.append({
@@ -51,8 +52,6 @@ def index(request):
             'moze_oceniac': moze_oceniac,
             'slowa_kluczowe': [x.slowo_kluczowe.nazwa for x in pomysl_slowa_kluczowe]
         })
-
-    print(pomysly_kto_moze_oceniac)
 
     context = {
         'pomysly': pomysly,
@@ -165,16 +164,17 @@ def usun_konkurs(request):
     return render(request, 'apsi_app/konkursy/usun-konkurs.html')
 
 
-def login(request):
-    return render(request, 'apsi_app/login.html')
-
-
 def profile(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+
+    if request.method == 'POST':
+        if 'wyloguj_sie' in request.POST:
+            logout(request)
+            return redirect('login')
+
     user = request.user
     user_groups = user.groups.all()
-    
-    for group in user_groups:
-        print(group)
 
     paginator = Paginator(Pomysl.objects.filter(uzytkownik=request.user), 5)
     page = request.GET.get('page')
