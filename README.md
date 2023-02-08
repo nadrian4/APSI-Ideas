@@ -21,9 +21,21 @@ python app/manage.py migrate apsi_app
 python app/manage.py migrate
 
 python app/manage.py createsuperuser
+```
 
+### Uruchomienie serwera
+```
 python app/manage.py runserver
 ```
+
+### Dodanie wymaganych grup do bazy danych
+Wymagane jest dodanie następujących grup do tabeli Groups przez panel admin django:
+- Członek komisji
+-	Organizator
+-	Pracownik
+-	Student
+
+Następnie należy ustawić wszystkie powyższe grupy użytkownikowi "admin". Przy dodawaniu kolejnego użytkownika należy ustawić odpowiednią grupę.
 
 ## Dodatkowe informacje
 ### Baza danych
